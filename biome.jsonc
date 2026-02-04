@@ -8,7 +8,6 @@
   },
   "files": {
     "includes": [
-      "**",
       "!bun.lock",
       "!**/convex/tsconfig.json",
       "!**/convex/_generated"
