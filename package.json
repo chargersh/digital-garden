@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "check": "ultracite check",
+    "lint": "ultracite check",
+    "typecheck": "tsc --noEmit",
+    "check": "bun run typecheck && bun run lint",
     "fix": "ultracite fix"
   },
   "dependencies": {
