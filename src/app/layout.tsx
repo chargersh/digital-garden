@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { ModeToggle } from "@/components/mode-toggle";
+import { ThemeProvider } from "@/components/theme-provider";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
 import { AppSidebar } from "@/features/sidebar/app-sidebar";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -27,14 +33,29 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html className={inter.variable} lang="en">
+    <html
+      className={`${inter.variable} overscroll-none`}
+      lang="en"
+      suppressHydrationWarning
+    >
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SidebarProvider>
-          <AppSidebar />
-          <SidebarInset>{children}</SidebarInset>
-        </SidebarProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          disableTransitionOnChange
+          enableSystem
+        >
+          <SidebarProvider>
+            <AppSidebar />
+            <SidebarInset>
+              <SidebarTrigger className="absolute top-4 left-4" />
+              {children}
+            </SidebarInset>
+            <ModeToggle className="fixed top-4 right-4 z-20" />
+          </SidebarProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
