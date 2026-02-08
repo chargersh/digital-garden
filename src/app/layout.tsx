@@ -1,13 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
-import { ModeToggle } from "@/components/mode-toggle";
 import { ThemeProvider } from "@/components/theme-provider";
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { PageHeader } from "@/features/header/page-header";
 import { AppSidebar } from "@/features/sidebar/app-sidebar";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -50,10 +46,9 @@ export default function RootLayout({
           <SidebarProvider>
             <AppSidebar />
             <SidebarInset>
-              <SidebarTrigger className="absolute top-4 left-4" />
+              <PageHeader />
               {children}
             </SidebarInset>
-            <ModeToggle className="fixed top-4 right-4 z-20" />
           </SidebarProvider>
         </ThemeProvider>
       </body>
