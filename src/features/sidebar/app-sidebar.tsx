@@ -1,103 +1,16 @@
-import { ChevronDown, ChevronRight, GalleryVerticalEnd } from "lucide-react";
+import { GalleryVerticalEnd } from "lucide-react";
 import type { ComponentProps } from "react";
 
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import {
   Sidebar,
   SidebarContent,
-  SidebarGroup,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
-
-const data: {
-  navMain: {
-    title: string;
-    url: string;
-    items: { title: string; url: string; isActive?: boolean }[];
-  }[];
-} = {
-  navMain: [
-    {
-      title: "Getting Started",
-      url: "/",
-      items: [
-        {
-          title: "Installation",
-          url: "/",
-        },
-        {
-          title: "Project Structure",
-          url: "/",
-        },
-      ],
-    },
-    {
-      title: "Building Your Application",
-      url: "/",
-      items: [
-        {
-          title: "Routing",
-          url: "/",
-        },
-        {
-          title: "Data Fetching",
-          url: "/",
-          isActive: true,
-        },
-        {
-          title: "Rendering",
-          url: "/",
-        },
-        {
-          title: "Caching",
-          url: "/",
-        },
-        {
-          title: "Styling",
-          url: "/",
-        },
-        {
-          title: "Optimizing",
-          url: "/",
-        },
-        {
-          title: "Configuring",
-          url: "/",
-        },
-        {
-          title: "Testing",
-          url: "/",
-        },
-        {
-          title: "Authentication",
-          url: "/",
-        },
-        {
-          title: "Deploying",
-          url: "/",
-        },
-        {
-          title: "Upgrading",
-          url: "/",
-        },
-        {
-          title: "Examples",
-          url: "#",
-        },
-      ],
-    },
-  ],
-};
+import { LessonGroup } from "./components/lesson-group";
+import { lessonGroups } from "./lesson-data";
 
 export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
   return (
@@ -119,44 +32,16 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarMenu>
-            {data.navMain.map((item) => (
-              <Collapsible
-                className="group/collapsible"
-                defaultOpen
-                key={item.title}
-              >
-                <SidebarMenuItem>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton>
-                      {item.title}
-                      <ChevronRight className="ml-auto group-data-[state=open]/collapsible:hidden" />
-                      <ChevronDown className="ml-auto group-data-[state=closed]/collapsible:hidden" />
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
-                  {item.items?.length ? (
-                    <CollapsibleContent>
-                      <SidebarMenuSub>
-                        {item.items.map((subItem) => (
-                          <SidebarMenuSubItem key={subItem.title}>
-                            <SidebarMenuSubButton
-                              asChild
-                              isActive={subItem.isActive}
-                            >
-                              <a href={subItem.url}>{subItem.title}</a>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-                        ))}
-                      </SidebarMenuSub>
-                    </CollapsibleContent>
-                  ) : null}
-                </SidebarMenuItem>
-              </Collapsible>
-            ))}
-          </SidebarMenu>
-        </SidebarGroup>
+      <SidebarContent className="custom-scrollbar stable-scrollbar-gutter flex-1 overflow-y-auto pb-6">
+        {lessonGroups.map((group, index) => (
+          <LessonGroup
+            className={index === 0 ? "mt-0 lg:mt-0" : undefined}
+            id={group.id}
+            items={group.items}
+            key={group.title}
+            title={group.title}
+          />
+        ))}
       </SidebarContent>
     </Sidebar>
   );
