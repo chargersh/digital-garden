@@ -38,6 +38,7 @@ const SIDEBAR_WIDTH = "16rem";
 const SIDEBAR_WIDTH_MOBILE = "18rem";
 const SIDEBAR_WIDTH_ICON = "3rem";
 const SIDEBAR_KEYBOARD_SHORTCUT = "b";
+const SIDEBAR_KEYBOARD_SHORTCUT_ENABLED = false;
 
 interface SidebarContextProps {
   state: "expanded" | "collapsed";
@@ -103,6 +104,10 @@ function SidebarProvider({
 
   // Adds a keyboard shortcut to toggle the sidebar.
   useEffect(() => {
+    if (!SIDEBAR_KEYBOARD_SHORTCUT_ENABLED) {
+      return;
+    }
+
     const handleKeyDown = (event: KeyboardEvent) => {
       if (
         event.key === SIDEBAR_KEYBOARD_SHORTCUT &&
