@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
+import { PageHeader } from "@/components/page-header";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { PageHeader } from "@/features/header/page-header";
 import { AppSidebar } from "@/features/sidebar/app-sidebar";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
