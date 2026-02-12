@@ -1,7 +1,7 @@
 import { TextAlignStart } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface TocItem {
+export interface TocItem {
   id: string;
   label: string;
   depth?: number;
@@ -19,7 +19,8 @@ export function TableOfContents({
   label = "On this page",
 }: TableOfContentsProps) {
   return (
-    <div
+    <nav
+      aria-label="Table of contents"
       className="sticky top-[calc(5.5rem+1px)] z-21 hidden h-[calc(100svh-6rem)] max-w-md self-start xl:flex xl:flex-col"
       id="content-side-layout"
     >
@@ -38,20 +39,18 @@ export function TableOfContents({
           <ul className="space-y-1" id="table-of-contents-content">
             {items.map((item) => {
               const isActive = item.id === activeId;
+              const depth = item.depth ?? 0;
 
               return (
-                <li
-                  className="relative"
-                  data-depth={item.depth ?? 0}
-                  key={item.id}
-                >
+                <li className="relative" data-depth={depth} key={item.id}>
                   <a
                     className={cn(
-                      "wrap-break-word block border-l-2 py-1 transition-colors",
+                      "wrap-break-word block border-l-2 py-1 transition-colors data-[depth=3]:pl-4 data-[depth=4]:pl-8 data-[depth=5]:pl-12 data-[depth=6]:pl-16",
                       isActive
                         ? "border-primary font-medium text-primary"
                         : "border-transparent text-muted-foreground hover:text-foreground"
                     )}
+                    data-depth={depth}
                     href={`#${item.id}`}
                   >
                     {item.label}
@@ -62,6 +61,6 @@ export function TableOfContents({
           </ul>
         </div>
       </div>
-    </div>
+    </nav>
   );
 }

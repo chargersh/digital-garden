@@ -1,11 +1,8 @@
 import type { ReactNode } from "react";
-import { TableOfContents } from "@/features/content/table-of-contents";
-
-interface TocItem {
-  id: string;
-  label: string;
-  depth?: number;
-}
+import {
+  TableOfContents,
+  type TocItem,
+} from "@/features/content/table-of-contents";
 
 interface LessonFrameProps {
   children: ReactNode;

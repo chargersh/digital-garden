@@ -15,7 +15,7 @@ export function PageHeader() {
       <div className="flex h-12 items-center gap-4 px-4 text-foreground lg:px-14">
         <div className="flex min-w-0 flex-1 items-center">
           <SidebarTrigger
-            aria-label="Open sidebar"
+            aria-label="Toggle sidebar"
             className="mr-2 -ml-2 size-8 text-foreground/80 hover:text-foreground md:hidden"
           />
           <Breadcrumb>
