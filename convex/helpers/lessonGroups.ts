@@ -22,7 +22,7 @@ export const assertUniqueLessonGroupUid = async (
   subjectId: Id<"subjects">,
   uid: string,
   excludeId?: Id<"lessonGroups">
-) => {
+): Promise<void> => {
   const existing = await db
     .query("lessonGroups")
     .withIndex("by_subjectId_and_uid", (q) =>
@@ -41,7 +41,7 @@ export const assertUniqueLessonGroupSlug = async (
   subjectId: Id<"subjects">,
   slug: string,
   excludeId?: Id<"lessonGroups">
-) => {
+): Promise<void> => {
   const existing = await db
     .query("lessonGroups")
     .withIndex("by_subjectId_and_slug", (q) =>
@@ -79,7 +79,7 @@ export const ensureDefaultLessonGroupForSubject = async (
     let counter = 0;
 
     while (true) {
-      const candidate = counter === 0 ? baseUid : `${baseUid}_${counter + 1}`;
+      const candidate = counter === 0 ? baseUid : `${baseUid}_${counter}`;
       const existing = await db
         .query("lessonGroups")
         .withIndex("by_subjectId_and_uid", (q) =>
@@ -98,7 +98,7 @@ export const ensureDefaultLessonGroupForSubject = async (
     let counter = 0;
 
     while (true) {
-      const candidate = counter === 0 ? baseSlug : `${baseSlug}-${counter + 1}`;
+      const candidate = counter === 0 ? baseSlug : `${baseSlug}-${counter}`;
       const existing = await db
         .query("lessonGroups")
         .withIndex("by_subjectId_and_slug", (q) =>
@@ -132,6 +132,13 @@ export const setDefaultLessonGroup = async (
   subjectId: Id<"subjects">,
   groupId: Id<"lessonGroups">
 ): Promise<void> => {
+  const target = await db.get(groupId);
+  if (!target || target.subjectId !== subjectId) {
+    throw new Error(
+      `Group "${groupId}" does not belong to subject "${subjectId}".`
+    );
+  }
+
   const groups = await db
     .query("lessonGroups")
     .withIndex("by_subjectId_and_isDefault", (q) =>

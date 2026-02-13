@@ -55,7 +55,7 @@ const getLessonOrThrow = async (
 const getGroupOrThrow = async (
   db: DatabaseReader,
   groupId: Id<"lessonGroups">
-) => {
+): Promise<Doc<"lessonGroups">> => {
   const group = await db.get(groupId);
   if (!group) {
     throw new Error(`Lesson group "${groupId}" was not found.`);
@@ -67,7 +67,7 @@ const assertNoCycle = async (
   db: DatabaseReader,
   lessonId: Id<"lessons">,
   parentLessonId: Id<"lessons"> | null
-) => {
+): Promise<void> => {
   let cursor = parentLessonId;
   while (cursor) {
     if (cursor === lessonId) {
@@ -86,6 +86,7 @@ const getLessonsByVisibility = async (
   subjectId: Id<"subjects">,
   includeDrafts: boolean
 ): Promise<LessonDoc[]> => {
+  // includeDrafts=true means "include non-published too", which includes archived.
   return await db
     .query("lessons")
     .withIndex("by_subjectId_and_status", (q) =>
@@ -541,18 +542,14 @@ export const removeSubtree = mutation({
     const subtreeRootLesson = await getLessonOrThrow(ctx.db, args.lessonId);
 
     const queue: Id<"lessons">[] = [subtreeRootLesson._id];
-    const toDelete: Id<"lessons">[] = [];
-    const deletedLessonUids: string[] = [];
+    const toDelete: Id<"lessons">[] = [subtreeRootLesson._id];
+    const deletedLessonUids: string[] = [subtreeRootLesson.uid];
 
     while (queue.length > 0) {
       const currentId = queue.shift();
-      if (!currentId) {
+      if (currentId === undefined) {
         break;
       }
-
-      toDelete.push(currentId);
-      const currentLesson = await getLessonOrThrow(ctx.db, currentId);
-      deletedLessonUids.push(currentLesson.uid);
 
       // Invariant: create/move enforce that a lesson and all descendants stay in
       // the same subject + group. This query relies on that for efficient subtree
@@ -571,6 +568,8 @@ export const removeSubtree = mutation({
 
       for (const child of children) {
         queue.push(child._id);
+        toDelete.push(child._id);
+        deletedLessonUids.push(child.uid);
       }
     }
 

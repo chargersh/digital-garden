@@ -197,13 +197,7 @@ export const ensureDefaultForSubject = mutation({
       ctx.db,
       args.subjectId
     );
-    const groups = await ctx.db
-      .query("lessonGroups")
-      .withIndex("by_subjectId_and_isDefault", (q) =>
-        q.eq("subjectId", args.subjectId).eq("isDefault", true)
-      )
-      .collect();
-    const ensured = groups.find((group) => group._id === groupId);
+    const ensured = await ctx.db.get(groupId);
     if (!ensured) {
       throw new Error("Invariant violation: default lesson group missing.");
     }

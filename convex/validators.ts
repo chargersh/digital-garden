@@ -76,6 +76,8 @@ export const sidebarItemValidator = v.object({
   lessonSlug: v.string(),
   href: v.string(),
   status: lessonStatusValidator,
+  // Convex validators don't support recursive types; nested SidebarNode[]
+  // items are validated structurally in application code instead.
   items: v.optional(v.array(v.any())),
 });
 
