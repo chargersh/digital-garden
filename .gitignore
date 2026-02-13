@@ -24,6 +24,7 @@
 .DS_Store
 *.pem
 scratch/
+plans/
 
 # debug
 npm-debug.log*
