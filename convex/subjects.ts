@@ -1,4 +1,4 @@
-import { v } from "convex/values";
+import { type ObjectType, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { normalizeRequired } from "./helpers/common";
 import {
@@ -6,24 +6,16 @@ import {
   assertUniqueSubjectUid,
   getNextSubjectOrder,
 } from "./helpers/subjects";
+import { subjectMutationResultValidator, subjectValidator } from "./validators";
 
-const subjectValidator = v.object({
-  _id: v.id("subjects"),
-  _creationTime: v.number(),
-  uid: v.string(),
-  name: v.string(),
-  slug: v.string(),
-  description: v.union(v.string(), v.null()),
-  order: v.number(),
-});
-const subjectMutationResultValidator = v.object({
-  _id: v.id("subjects"),
-  uid: v.string(),
-  name: v.string(),
-  slug: v.string(),
-  description: v.union(v.string(), v.null()),
-  order: v.number(),
-});
+const updateSubjectArgs = {
+  subjectId: v.id("subjects"),
+  uid: v.optional(v.string()),
+  name: v.optional(v.string()),
+  slug: v.optional(v.string()),
+  description: v.optional(v.union(v.string(), v.null())),
+};
+type UpdateSubjectArgs = ObjectType<typeof updateSubjectArgs>;
 
 export const list = query({
   args: {},
@@ -86,13 +78,7 @@ export const create = mutation({
 });
 
 export const update = mutation({
-  args: {
-    subjectId: v.id("subjects"),
-    uid: v.optional(v.string()),
-    name: v.optional(v.string()),
-    slug: v.optional(v.string()),
-    description: v.optional(v.union(v.string(), v.null())),
-  },
+  args: updateSubjectArgs,
   returns: subjectMutationResultValidator,
   handler: async (ctx, args) => {
     const subject = await ctx.db.get(args.subjectId);
@@ -100,12 +86,7 @@ export const update = mutation({
       throw new Error(`Subject "${args.subjectId}" was not found.`);
     }
 
-    const patch: {
-      description?: string | null;
-      name?: string;
-      slug?: string;
-      uid?: string;
-    } = {};
+    const patch: Partial<Omit<UpdateSubjectArgs, "subjectId">> = {};
 
     if (args.uid !== undefined) {
       const uid = normalizeRequired(args.uid, "uid");
@@ -137,7 +118,10 @@ export const update = mutation({
       uid: patch.uid ?? subject.uid,
       name: patch.name ?? subject.name,
       slug: patch.slug ?? subject.slug,
-      description: patch.description ?? subject.description,
+      description:
+        patch.description !== undefined
+          ? patch.description
+          : subject.description,
       order: subject.order,
     };
   },

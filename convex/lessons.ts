@@ -1,4 +1,4 @@
-import { v } from "convex/values";
+import { type ObjectType, v } from "convex/values";
 import type { Doc, Id } from "./_generated/dataModel";
 import type { DatabaseReader } from "./_generated/server";
 import { mutation, query } from "./_generated/server";
@@ -9,75 +9,28 @@ import {
   assertUniqueLessonUid,
   getNextLessonOrder,
 } from "./helpers/lessons";
-import { difficultyValidator, lessonStatusValidator } from "./validators";
-
-const lessonValidator = v.object({
-  _id: v.id("lessons"),
-  _creationTime: v.number(),
-  uid: v.string(),
-  subjectId: v.id("subjects"),
-  groupId: v.id("lessonGroups"),
-  parentLessonId: v.union(v.id("lessons"), v.null()),
-  title: v.string(),
-  description: v.string(),
-  lessonSlug: v.string(),
-  bodyMdx: v.string(),
-  order: v.number(),
-  difficulty: difficultyValidator,
-  status: lessonStatusValidator,
-  updatedAt: v.string(),
-  summary: v.union(v.string(), v.null()),
-});
-const lessonMutationResultValidator = v.object({
-  _id: v.id("lessons"),
-  uid: v.string(),
-  subjectId: v.id("subjects"),
-  groupId: v.id("lessonGroups"),
-  parentLessonId: v.union(v.id("lessons"), v.null()),
-  title: v.string(),
-  description: v.string(),
-  lessonSlug: v.string(),
-  bodyMdx: v.string(),
-  order: v.number(),
-  difficulty: difficultyValidator,
-  status: lessonStatusValidator,
-  updatedAt: v.string(),
-  summary: v.union(v.string(), v.null()),
-});
-
-const sidebarItemValidator = v.object({
-  id: v.id("lessons"),
-  uid: v.string(),
-  title: v.string(),
-  lessonSlug: v.string(),
-  href: v.string(),
-  status: lessonStatusValidator,
-  items: v.optional(v.array(v.any())),
-});
-
-const lessonGroupWithItemsValidator = v.object({
-  _id: v.id("lessonGroups"),
-  _creationTime: v.number(),
-  uid: v.string(),
-  subjectId: v.id("subjects"),
-  title: v.string(),
-  slug: v.string(),
-  order: v.number(),
-  isDefault: v.boolean(),
-  items: v.array(sidebarItemValidator),
-});
-
-const subjectValidator = v.object({
-  _id: v.id("subjects"),
-  _creationTime: v.number(),
-  uid: v.string(),
-  name: v.string(),
-  slug: v.string(),
-  description: v.union(v.string(), v.null()),
-  order: v.number(),
-});
+import {
+  difficultyValidator,
+  lessonGroupWithItemsValidator,
+  lessonMutationResultValidator,
+  lessonStatusValidator,
+  lessonValidator,
+  subjectValidator,
+} from "./validators";
 
 type LessonDoc = Doc<"lessons">;
+const updateLessonArgs = {
+  lessonId: v.id("lessons"),
+  uid: v.optional(v.string()),
+  title: v.optional(v.string()),
+  description: v.optional(v.string()),
+  lessonSlug: v.optional(v.string()),
+  bodyMdx: v.optional(v.string()),
+  difficulty: v.optional(difficultyValidator),
+  summary: v.optional(v.union(v.string(), v.null())),
+};
+type UpdateLessonArgs = ObjectType<typeof updateLessonArgs>;
+
 interface SidebarNode {
   id: Id<"lessons">;
   uid: string;
@@ -133,37 +86,14 @@ const getLessonsByVisibility = async (
   subjectId: Id<"subjects">,
   includeDrafts: boolean
 ): Promise<LessonDoc[]> => {
-  if (!includeDrafts) {
-    return await db
-      .query("lessons")
-      .withIndex("by_subjectId_and_status", (q) =>
-        q.eq("subjectId", subjectId).eq("status", "published")
-      )
-      .collect();
-  }
-
-  const [draft, published, archived] = await Promise.all([
-    db
-      .query("lessons")
-      .withIndex("by_subjectId_and_status", (q) =>
-        q.eq("subjectId", subjectId).eq("status", "draft")
-      )
-      .collect(),
-    db
-      .query("lessons")
-      .withIndex("by_subjectId_and_status", (q) =>
-        q.eq("subjectId", subjectId).eq("status", "published")
-      )
-      .collect(),
-    db
-      .query("lessons")
-      .withIndex("by_subjectId_and_status", (q) =>
-        q.eq("subjectId", subjectId).eq("status", "archived")
-      )
-      .collect(),
-  ]);
-
-  return [...draft, ...published, ...archived];
+  return await db
+    .query("lessons")
+    .withIndex("by_subjectId_and_status", (q) =>
+      includeDrafts
+        ? q.eq("subjectId", subjectId)
+        : q.eq("subjectId", subjectId).eq("status", "published")
+    )
+    .collect();
 };
 
 export const getByRoute = query({
@@ -362,7 +292,7 @@ export const create = mutation({
       parentLessonId
     );
 
-    const updatedAt = new Date().toISOString();
+    const updatedAt = Date.now();
     const summary = args.summary?.trim() ?? null;
     const lessonId = await ctx.db.insert("lessons", {
       uid,
@@ -400,21 +330,14 @@ export const create = mutation({
 });
 
 export const update = mutation({
-  args: {
-    lessonId: v.id("lessons"),
-    uid: v.optional(v.string()),
-    title: v.optional(v.string()),
-    description: v.optional(v.string()),
-    lessonSlug: v.optional(v.string()),
-    bodyMdx: v.optional(v.string()),
-    difficulty: v.optional(difficultyValidator),
-    summary: v.optional(v.union(v.string(), v.null())),
-  },
+  args: updateLessonArgs,
   returns: lessonMutationResultValidator,
   handler: async (ctx, args) => {
     const lesson = await getLessonOrThrow(ctx.db, args.lessonId);
-    const updatedAt = new Date().toISOString();
-    const patch: Record<string, unknown> = { updatedAt };
+    const updatedAt = Date.now();
+    const patch: Partial<Omit<UpdateLessonArgs, "lessonId">> & {
+      updatedAt: number;
+    } = { updatedAt };
 
     if (args.uid !== undefined) {
       const uid = normalizeRequired(args.uid, "uid");
@@ -460,22 +383,19 @@ export const update = mutation({
     await ctx.db.patch(lesson._id, patch);
     return {
       _id: lesson._id,
-      uid: (patch.uid as string | undefined) ?? lesson.uid,
+      uid: patch.uid ?? lesson.uid,
       subjectId: lesson.subjectId,
       groupId: lesson.groupId,
       parentLessonId: lesson.parentLessonId,
-      title: (patch.title as string | undefined) ?? lesson.title,
-      description:
-        (patch.description as string | undefined) ?? lesson.description,
-      lessonSlug: (patch.lessonSlug as string | undefined) ?? lesson.lessonSlug,
-      bodyMdx: (patch.bodyMdx as string | undefined) ?? lesson.bodyMdx,
-      order: (patch.order as number | undefined) ?? lesson.order,
-      difficulty:
-        (patch.difficulty as LessonDoc["difficulty"] | undefined) ??
-        lesson.difficulty,
+      title: patch.title ?? lesson.title,
+      description: patch.description ?? lesson.description,
+      lessonSlug: patch.lessonSlug ?? lesson.lessonSlug,
+      bodyMdx: patch.bodyMdx ?? lesson.bodyMdx,
+      order: lesson.order,
+      difficulty: patch.difficulty ?? lesson.difficulty,
       status: lesson.status,
       updatedAt,
-      summary: (patch.summary as string | null | undefined) ?? lesson.summary,
+      summary: patch.summary !== undefined ? patch.summary : lesson.summary,
     };
   },
 });
@@ -488,7 +408,7 @@ export const setStatus = mutation({
   returns: lessonMutationResultValidator,
   handler: async (ctx, args) => {
     const lesson = await getLessonOrThrow(ctx.db, args.lessonId);
-    const updatedAt = new Date().toISOString();
+    const updatedAt = Date.now();
     await ctx.db.patch(lesson._id, {
       status: args.status,
       updatedAt,
@@ -551,7 +471,7 @@ export const move = mutation({
       targetParent ?? null
     );
 
-    const updatedAt = new Date().toISOString();
+    const updatedAt = Date.now();
     await ctx.db.patch(lesson._id, {
       groupId: targetGroupId,
       parentLessonId: targetParent ?? null,
@@ -634,6 +554,9 @@ export const removeSubtree = mutation({
       const currentLesson = await getLessonOrThrow(ctx.db, currentId);
       deletedLessonUids.push(currentLesson.uid);
 
+      // Invariant: create/move enforce that a lesson and all descendants stay in
+      // the same subject + group. This query relies on that for efficient subtree
+      // traversal. If cross-group descendants are ever allowed, this must change.
       const children = await ctx.db
         .query("lessons")
         .withIndex(

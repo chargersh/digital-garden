@@ -39,7 +39,7 @@ export default defineSchema({
     order: v.number(),
     difficulty: difficultyValidator,
     status: lessonStatusValidator,
-    updatedAt: v.string(),
+    updatedAt: v.number(),
     summary: v.union(v.string(), v.null()),
   })
     .index("by_subjectId_and_uid", ["subjectId", "uid"])

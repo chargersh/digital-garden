@@ -1,4 +1,4 @@
-import { v } from "convex/values";
+import { type ObjectType, v } from "convex/values";
 import type { Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
 import { normalizeRequired } from "./helpers/common";
@@ -9,26 +9,19 @@ import {
   getNextLessonGroupOrder,
   setDefaultLessonGroup,
 } from "./helpers/lessonGroups";
+import {
+  lessonGroupMutationResultValidator,
+  lessonGroupValidator,
+} from "./validators";
 
-const lessonGroupValidator = v.object({
-  _id: v.id("lessonGroups"),
-  _creationTime: v.number(),
-  uid: v.string(),
-  subjectId: v.id("subjects"),
-  title: v.string(),
-  slug: v.string(),
-  order: v.number(),
-  isDefault: v.boolean(),
-});
-const lessonGroupMutationResultValidator = v.object({
-  _id: v.id("lessonGroups"),
-  uid: v.string(),
-  subjectId: v.id("subjects"),
-  title: v.string(),
-  slug: v.string(),
-  order: v.number(),
-  isDefault: v.boolean(),
-});
+const updateLessonGroupArgs = {
+  groupId: v.id("lessonGroups"),
+  uid: v.optional(v.string()),
+  title: v.optional(v.string()),
+  slug: v.optional(v.string()),
+  isDefault: v.optional(v.boolean()),
+};
+type UpdateLessonGroupArgs = ObjectType<typeof updateLessonGroupArgs>;
 
 export const listBySubject = query({
   args: {
@@ -92,13 +85,7 @@ export const create = mutation({
 });
 
 export const update = mutation({
-  args: {
-    groupId: v.id("lessonGroups"),
-    uid: v.optional(v.string()),
-    title: v.optional(v.string()),
-    slug: v.optional(v.string()),
-    isDefault: v.optional(v.boolean()),
-  },
+  args: updateLessonGroupArgs,
   returns: lessonGroupMutationResultValidator,
   handler: async (ctx, args) => {
     const group = await ctx.db.get(args.groupId);
@@ -106,12 +93,7 @@ export const update = mutation({
       throw new Error(`Lesson group "${args.groupId}" was not found.`);
     }
 
-    const patch: {
-      uid?: string;
-      title?: string;
-      slug?: string;
-      isDefault?: boolean;
-    } = {};
+    const patch: Partial<Omit<UpdateLessonGroupArgs, "groupId">> = {};
 
     if (args.uid !== undefined) {
       const uid = normalizeRequired(args.uid, "uid");
@@ -165,6 +147,11 @@ export const reorder = mutation({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
+    const uniqueIds = new Set(args.orderedGroupIds);
+    if (uniqueIds.size !== args.orderedGroupIds.length) {
+      throw new Error("orderedGroupIds must not contain duplicates.");
+    }
+
     const groups = await ctx.db
       .query("lessonGroups")
       .withIndex("by_subjectId_and_order", (q) =>

@@ -74,12 +74,54 @@ export const ensureDefaultLessonGroupForSubject = async (
     return first._id;
   }
 
+  const buildUniqueDefaultUid = async (): Promise<string> => {
+    const baseUid = `lg_default_${subjectId}`;
+    let counter = 0;
+
+    while (true) {
+      const candidate = counter === 0 ? baseUid : `${baseUid}_${counter + 1}`;
+      const existing = await db
+        .query("lessonGroups")
+        .withIndex("by_subjectId_and_uid", (q) =>
+          q.eq("subjectId", subjectId).eq("uid", candidate)
+        )
+        .unique();
+      if (!existing) {
+        return candidate;
+      }
+      counter += 1;
+    }
+  };
+
+  const buildUniqueDefaultSlug = async (): Promise<string> => {
+    const baseSlug = "lessons";
+    let counter = 0;
+
+    while (true) {
+      const candidate = counter === 0 ? baseSlug : `${baseSlug}-${counter + 1}`;
+      const existing = await db
+        .query("lessonGroups")
+        .withIndex("by_subjectId_and_slug", (q) =>
+          q.eq("subjectId", subjectId).eq("slug", candidate)
+        )
+        .unique();
+      if (!existing) {
+        return candidate;
+      }
+      counter += 1;
+    }
+  };
+
+  const [uid, slug] = await Promise.all([
+    buildUniqueDefaultUid(),
+    buildUniqueDefaultSlug(),
+  ]);
   const order = await getNextLessonGroupOrder(db, subjectId);
   return await db.insert("lessonGroups", {
-    uid: `lg_default_${subjectId}`,
+    uid,
     subjectId,
     title: "Lessons",
-    slug: "lessons",
+    slug,
     order,
     isDefault: true,
   });
@@ -103,9 +145,7 @@ export const setDefaultLessonGroup = async (
       shouldPatchTarget = false;
       continue;
     }
-    if (group._id !== groupId) {
-      await db.patch(group._id, { isDefault: false });
-    }
+    await db.patch(group._id, { isDefault: false });
   }
 
   if (shouldPatchTarget) {
