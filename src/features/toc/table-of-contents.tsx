@@ -95,8 +95,9 @@ function TOCItems() {
           continue;
         }
 
+        const escaped = CSS.escape(item.url.slice(1));
         const element = container.querySelector<HTMLElement>(
-          `a[href="#${item.url.slice(1)}"]`
+          `a[href="#${escaped}"]`
         );
         if (!element) {
           continue;
@@ -200,8 +201,8 @@ function TOCListItem({
   lower?: number;
 }) {
   const offset = getLineOffset(item.depth);
-  const upperOffset = getLineOffset(upper ?? item.depth);
-  const lowerOffset = getLineOffset(lower ?? item.depth);
+  const upperOffset = getLineOffset(upper);
+  const lowerOffset = getLineOffset(lower);
 
   return (
     <TOCItem

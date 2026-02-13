@@ -67,6 +67,7 @@ export const remarkHeading = ({
         const customSlug = match?.[1];
         if (customSlug) {
           headingProperties.id = customSlug;
+          slugger.slug(customSlug);
           finalChild.value = finalChild.value.slice(0, match.index).trimEnd();
         }
       }

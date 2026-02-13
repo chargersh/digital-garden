@@ -32,12 +32,10 @@
     font-weight: 500;
   }
 
-  .prose.prose-compact h1,
-  .prose.prose-compact h2,
-  .prose.prose-compact h3,
-  .prose.prose-compact h4,
-  .prose.prose-compact h5,
-  .prose.prose-compact h6 {
+  .prose.prose-compact
+    :where(h1, h2, h3, h4, h5, h6):not(
+      :where([class~="not-prose"], [class~="not-prose"] *)
+    ) {
     break-after: avoid;
   }
 
@@ -51,7 +49,7 @@
   .prose.prose-compact
     :where(h1):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
     margin-top: 0;
-    margin-bottom: 0.888889em;
+    margin-bottom: 0.8889em;
   }
 
   .prose.prose-compact
@@ -112,7 +110,9 @@
       var(--default-transition-timing-function)
     );
     transition-duration: var(--tw-duration, var(--default-transition-duration));
+
     --tw-duration: 0.2s;
+
     border-radius: 0.25rem;
     animation-duration: 0.2s;
     position: relative;
