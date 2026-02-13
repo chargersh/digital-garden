@@ -1,12 +1,6 @@
 "use client";
 
-import type {
-  ComponentProps,
-  MutableRefObject,
-  ReactNode,
-  Ref,
-  RefObject,
-} from "react";
+import type { ComponentProps, ReactNode, Ref, RefObject } from "react";
 import {
   createContext,
   useContext,
@@ -27,19 +21,40 @@ const ScrollContext = createContext<RefObject<HTMLElement | null>>({
   current: null,
 });
 
+const isRefObject = <T,>(
+  ref: Ref<T> | undefined
+): ref is RefObject<T | null> => {
+  return typeof ref === "object" && ref !== null && "current" in ref;
+};
+
 const mergeRefs = <T,>(...refs: Array<Ref<T> | undefined>) => {
-  return (value: T) => {
+  return (value: T | null) => {
+    const cleanups: Array<() => void> = [];
+
     for (const ref of refs) {
       if (!ref) {
         continue;
       }
 
       if (typeof ref === "function") {
-        ref(value);
-      } else {
-        (ref as MutableRefObject<T>).current = value;
+        const cleanup = ref(value);
+        if (typeof cleanup === "function") {
+          cleanups.push(cleanup);
+        }
+      } else if (isRefObject(ref)) {
+        ref.current = value;
       }
     }
+
+    if (cleanups.length === 0) {
+      return;
+    }
+
+    return () => {
+      for (const cleanup of cleanups) {
+        cleanup();
+      }
+    };
   };
 };
 
@@ -189,7 +204,10 @@ function calcThumb(container: HTMLElement, active: string[]): [number, number] {
   let lower = 0;
 
   for (const item of active) {
-    const element = container.querySelector<HTMLElement>(`a[href="#${item}"]`);
+    const escaped = CSS.escape(item);
+    const element = container.querySelector<HTMLElement>(
+      `a[href="#${escaped}"]`
+    );
     if (!element) {
       continue;
     }

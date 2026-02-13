@@ -30,7 +30,7 @@ const parseTocItem = (value: unknown): TocItem | null => {
   const url =
     "url" in value && typeof value.url === "string" ? value.url : null;
 
-  if (!(title && depth && url)) {
+  if (!(title && depth != null && url)) {
     return null;
   }
 

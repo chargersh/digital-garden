@@ -13,6 +13,7 @@ const mockLessonPath = path.join(process.cwd(), "src", "mock", "lesson.mdx");
 const canonicalSubject = "math";
 const canonicalLesson = "domain";
 const canonicalUrl = `/${canonicalSubject}/${canonicalLesson}`;
+const isoDatePattern = /^\d{4}-\d{2}-\d{2}(?:$|T)/;
 
 const difficultyValues: LessonDifficulty[] = [
   "beginner",
@@ -27,6 +28,10 @@ const isString = (value: unknown): value is string => {
 
 const normalizeIsoDate = (value: unknown): string | null => {
   if (isString(value)) {
+    if (!isoDatePattern.test(value)) {
+      return null;
+    }
+
     return Number.isNaN(Date.parse(value)) ? null : value;
   }
 
@@ -121,7 +126,11 @@ const parseFrontmatter = (
   };
 };
 
-export const getCanonicalLessonRoute = () => {
+export const getCanonicalLessonRoute = (): {
+  lesson: string;
+  subject: string;
+  url: string;
+} => {
   return {
     lesson: canonicalLesson,
     subject: canonicalSubject,

@@ -6,6 +6,8 @@ import {
 import { getMDXComponents } from "@/features/mdx/mdx-components";
 import { TableOfContents } from "@/features/toc/table-of-contents";
 
+const mdxComponents = getMDXComponents();
+
 interface LessonPageProps {
   params: Promise<{
     lesson: string;
@@ -14,12 +16,11 @@ interface LessonPageProps {
 }
 
 export default async function LessonPage({ params }: LessonPageProps) {
-  const [{ subject, lesson }, canonicalRoute, compiledLesson] =
-    await Promise.all([
-      params,
-      Promise.resolve(getCanonicalLessonRoute()),
-      getMockLesson(),
-    ]);
+  const canonicalRoute = getCanonicalLessonRoute();
+  const [{ subject, lesson }, compiledLesson] = await Promise.all([
+    params,
+    getMockLesson(),
+  ]);
 
   if (subject !== canonicalRoute.subject || lesson !== canonicalRoute.lesson) {
     redirect(canonicalRoute.url);
@@ -39,7 +40,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
             {compiledLesson.frontmatter.description}
           </p>
           <div className="prose prose-slate prose-compact dark:prose-invert mt-10 max-w-none prose-headings:scroll-mt-24 prose-a:font-medium text-foreground prose-code:before:content-none prose-code:after:content-none">
-            <Body components={getMDXComponents()} />
+            <Body components={mdxComponents} />
           </div>
         </article>
       </div>

@@ -18,6 +18,11 @@ interface TableOfContentsProps {
   items: readonly TocItem[];
 }
 
+const ITEM_OFFSET_DEPTH_2 = 14;
+const ITEM_OFFSET_DEPTH_3 = 26;
+const ITEM_OFFSET_DEPTH_DEEP = 36;
+const LINE_OFFSET_DEPTH_3 = 10;
+
 export function TableOfContents({ items }: TableOfContentsProps) {
   const onScrollToTop = () => {
     window.scrollTo({
@@ -85,15 +90,20 @@ function TOCItems() {
       const segments: string[] = [];
 
       for (let index = 0; index < items.length; index++) {
+        const item = items[index];
+        if (!item) {
+          continue;
+        }
+
         const element = container.querySelector<HTMLElement>(
-          `a[href="#${items[index]?.url.slice(1)}"]`
+          `a[href="#${item.url.slice(1)}"]`
         );
         if (!element) {
           continue;
         }
 
         const styles = getComputedStyle(element);
-        const lineOffset = getLineOffset(items[index]?.depth ?? 0) + 1;
+        const lineOffset = getLineOffset(item.depth) + 1;
         const top = element.offsetTop + Number.parseFloat(styles.paddingTop);
         const bottom =
           element.offsetTop +
@@ -166,18 +176,18 @@ function TOCItems() {
 
 function getItemOffset(depth: number): number {
   if (depth <= 2) {
-    return 14;
+    return ITEM_OFFSET_DEPTH_2;
   }
 
   if (depth === 3) {
-    return 26;
+    return ITEM_OFFSET_DEPTH_3;
   }
 
-  return 36;
+  return ITEM_OFFSET_DEPTH_DEEP;
 }
 
 function getLineOffset(depth: number): number {
-  return depth >= 3 ? 10 : 0;
+  return depth >= 3 ? LINE_OFFSET_DEPTH_3 : 0;
 }
 
 function TOCListItem({

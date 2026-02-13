@@ -19,7 +19,6 @@ declare module "mdast" {
 }
 
 const customIdPattern = /\s*\[#([^\]]+)]\s*$/;
-const slugger = new GithubSlugger();
 
 const flattenNodeText = (value: unknown): string => {
   if (!value || typeof value !== "object") {
@@ -54,7 +53,7 @@ export const remarkHeading = ({
   generateToc = true,
 }: RemarkHeadingOptions = {}): Transformer<Root, Root> => {
   return (root, file) => {
-    slugger.reset();
+    const slugger = new GithubSlugger();
     const tocItems: TocItem[] = [];
 
     visit(root, "heading", (heading: Heading) => {

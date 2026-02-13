@@ -44,11 +44,11 @@ const Anchor = ({
   if (isExternal) {
     return (
       <a
+        {...props}
         className={combinedClassName}
         href={href}
         rel="noopener noreferrer"
         target="_blank"
-        {...props}
       />
     );
   }
@@ -62,7 +62,6 @@ const MdxImage = ({
   className,
   width,
   height,
-  ...props
 }: ImgHTMLAttributes<HTMLImageElement>) => {
   if (!src || typeof src !== "string") {
     return null;
@@ -87,7 +86,6 @@ const MdxImage = ({
       }
       unoptimized
       width={resolvedWidth}
-      {...props}
     />
   );
 };

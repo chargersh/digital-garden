@@ -35,7 +35,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} custom-scrollbar antialiased`}
       >
         <ThemeProvider
           attribute="class"

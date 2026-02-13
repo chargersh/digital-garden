@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
+import { getCanonicalLessonRoute } from "@/features/mdx/load-lesson-mock";
 
 export default function HomePage() {
-  redirect("/math/domain");
+  redirect(getCanonicalLessonRoute().url);
 }
