@@ -1,0 +1,302 @@
+---
+title: Domain of a Function
+description: Understand how to determine valid inputs and represent domain constraints.
+subject: math
+lessonSlug: domain
+order: 1
+difficulty: beginner
+tags:
+  - algebra
+  - functions
+  - foundations
+status: published
+updatedAt: 2026-02-12
+estimatedMinutes: 25
+summary: Learn interval notation, exclusions, and a repeatable method for finding domain from formulas and context.
+---
+
+# Domain of a Function
+
+<Badge variant="secondary">Beginner</Badge>
+
+The **domain** of a function is the set of all inputs that make the function meaningful. When a value breaks the expression, that value is not in the domain. Domain is not a side detail; it is part of the function itself.
+
+## Learning objectives
+
+By the end of this lesson, you should be able to:
+
+1. Identify domain restrictions from common expression types.
+2. Write domains using inequalities and interval notation.
+3. Combine multiple restrictions correctly.
+4. Check and explain why a value is included or excluded.
+
+## Why domain matters
+
+Most errors with functions happen before algebra starts. If you use an invalid input, every step after that can look clean but still be wrong.
+
+A fast habit: before solving, graphing, or simplifying, ask:
+
+1. What inputs make this undefined?
+2. How do I represent the allowed inputs precisely?
+
+## Formal definition
+
+For a real-valued function:
+
+$$
+\operatorname{Dom}(f)=\{x\in\mathbb{R}\mid f(x)\text{ is defined in }\mathbb{R}\}
+$$
+
+If the expression is not defined for some real number, that number is excluded.
+
+## Core restriction rules
+
+### Rule 1: Denominators cannot be zero
+
+If an expression has a denominator, exclude values that make the denominator zero.
+
+Example pattern:
+
+$$
+\frac{1}{g(x)}\quad\Rightarrow\quad g(x)\neq 0
+$$
+
+### Rule 2: Even roots need non-negative radicands
+
+For square roots and other even roots:
+
+$$
+\sqrt{g(x)}\quad\Rightarrow\quad g(x)\ge 0
+$$
+
+(For real-valued functions.)
+
+### Rule 3: Logarithm arguments must be positive
+
+For logarithms:
+
+$$
+\log(g(x))\quad\Rightarrow\quad g(x)>0
+$$
+
+Zero and negative arguments are invalid.
+
+## Interval notation refresher
+
+| Statement | Interval |
+| :--- | :--- |
+| $x < a$ | $(-\infty, a)$ |
+| $x \le a$ | $(-\infty, a]$ |
+| $x > a$ | $(a, \infty)$ |
+| $x \ge a$ | $[a, \infty)$ |
+| Exclude one point $a$ | $(-\infty, a) \cup (a, \infty)$ |
+
+Parentheses mean endpoint excluded. Brackets mean endpoint included.
+
+## Standard process for finding domain
+
+1. Write each restriction separately.
+2. Solve each restriction.
+3. Convert each result to interval form.
+4. Intersect allowed sets (because all conditions must hold).
+5. Remove explicitly forbidden points.
+6. Quick-check with sample values.
+
+## Worked examples
+
+### Example 1: Rational function
+
+Find the domain of:
+
+$$
+f(x)=\frac{1}{x-3}
+$$
+
+Restriction:
+
+$$
+x-3\neq 0 \Rightarrow x\neq 3
+$$
+
+Domain:
+
+$$
+(-\infty,3)\cup(3,\infty)
+$$
+
+### Example 2: Square root function
+
+Find the domain of:
+
+$$
+g(x)=\sqrt{x-5}
+$$
+
+Restriction:
+
+$$
+x-5\ge 0 \Rightarrow x\ge 5
+$$
+
+Domain:
+
+$$
+[5,\infty)
+$$
+
+### Example 3: Logarithmic function
+
+Find the domain of:
+
+$$
+h(x)=\ln(2x+1)
+$$
+
+Restriction:
+
+$$
+2x+1>0 \Rightarrow x>-\frac{1}{2}
+$$
+
+Domain:
+
+$$
+\left(-\frac{1}{2},\infty\right)
+$$
+
+### Example 4: Mixed restrictions
+
+Find the domain of:
+
+$$
+p(x)=\frac{\sqrt{x-1}}{x-4}
+$$
+
+Restrictions:
+
+$$
+x-1\ge 0 \Rightarrow x\ge 1
+$$
+
+$$
+x-4\neq 0 \Rightarrow x\neq 4
+$$
+
+Combine by intersection, then remove 4:
+
+$$
+[1,4)\cup(4,\infty)
+$$
+
+### Example 5: Radical in denominator
+
+Find the domain of:
+
+$$
+q(x)=\frac{1}{\sqrt{x+2}}
+$$
+
+Because the square root is in the denominator, it must be defined **and nonzero**:
+
+$$
+x+2>0
+$$
+
+Domain:
+
+$$
+(-2,\infty)
+$$
+
+### Example 6: Log of a rational expression
+
+Find the domain of:
+
+$$
+r(x)=\ln\!\left(\frac{x-2}{x+5}\right)
+$$
+
+Need argument positive:
+
+$$
+\frac{x-2}{x+5}>0
+$$
+
+Critical points: $-5$ and $2$. Sign analysis gives:
+
+$$
+(-\infty,-5)\cup(2,\infty)
+$$
+
+Also note $x=-5$ is excluded automatically (division by zero).
+
+## Graph interpretation
+
+Domain tells you where a graph can exist on the x-axis.
+
+1. Excluded denominator values often produce vertical asymptotes or holes.
+2. Root restrictions create starting endpoints.
+3. Log restrictions create hard boundaries where the graph cannot cross.
+
+When sketching, mark domain boundaries first.
+
+## Domain from context (word problems)
+
+Not all restrictions are algebraic. Context can restrict inputs.
+
+Examples:
+
+1. Time cannot be negative.
+2. Length/area cannot be negative.
+3. Counts are often integers, not all real numbers.
+
+If a formula allows a value but the scenario does not, context wins.
+
+## Common mistakes
+
+1. Using $\ge 0$ for log arguments (must be $>0$).
+2. Forgetting denominator restrictions after simplification.
+3. Union instead of intersection when combining constraints.
+4. Wrong endpoint symbols in interval notation.
+5. Ignoring context restrictions in applications.
+
+## Quick self-check workflow
+
+Before finalizing your answer:
+
+1. List every restriction source (denominator, root, log, context).
+2. Re-solve each restriction independently.
+3. Rebuild domain from intersection.
+4. Test one value in each included interval.
+5. Test one excluded boundary value.
+
+## Practice problems
+
+Find the domain of each function.
+
+1. $a(x)=\frac{3}{x+2}$
+2. $b(x)=\sqrt{7-x}$
+3. $c(x)=\ln(x^2-9)$
+4. $d(x)=\frac{\sqrt{x+1}}{x^2-1}$
+5. $e(x)=\frac{1}{\sqrt{5-2x}}$
+6. $f(x)=\ln\!\left(\frac{x+1}{x-4}\right)$
+
+## Answer key
+
+1. $(-\infty,-2)\cup(-2,\infty)$
+2. $(-\infty,7]$
+3. $(-\infty,-3)\cup(3,\infty)$
+4. $[-1,1)\cup(1,\infty)$
+5. $(-\infty,\tfrac{5}{2})$
+6. $(-\infty,-1)\cup(4,\infty)$
+
+## Recap
+
+Domain is a foundational habit, not a one-off step.
+
+If you consistently identify restrictions first, your algebra, graphing, and interpretation become more reliable. The method is always the same:
+
+1. identify restrictions,
+2. solve them,
+3. intersect valid sets,
+4. verify endpoints and excluded values.
