@@ -12,5 +12,17 @@
       "!**/convex/tsconfig.json",
       "!**/convex/_generated"
     ]
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["convex/**/*.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "useFilenamingConvention": "off"
+          }
+        }
+      }
+    }
+  ]
 }
