@@ -84,24 +84,69 @@ const assertNoCycle = async (
 const getLessonsByVisibility = async (
   db: DatabaseReader,
   subjectId: Id<"subjects">,
-  includeDrafts: boolean
+  includeUnpublished: boolean
 ): Promise<LessonDoc[]> => {
-  // includeDrafts=true means "include non-published too", which includes archived.
+  // includeUnpublished=true means "include non-published too", i.e. draft+archived.
   return await db
     .query("lessons")
     .withIndex("by_subjectId_and_status", (q) =>
-      includeDrafts
+      includeUnpublished
         ? q.eq("subjectId", subjectId)
         : q.eq("subjectId", subjectId).eq("status", "published")
     )
     .collect();
 };
 
+const moveDescendantsToGroup = async (
+  db: DatabaseReader & {
+    patch: (
+      id: Id<"lessons">,
+      value: Partial<Pick<LessonDoc, "groupId" | "updatedAt">>
+    ) => Promise<void>;
+  },
+  subjectId: Id<"subjects">,
+  fromGroupId: Id<"lessonGroups">,
+  toGroupId: Id<"lessonGroups">,
+  rootLessonId: Id<"lessons">,
+  updatedAt: number
+): Promise<void> => {
+  const queue: Id<"lessons">[] = [rootLessonId];
+  const descendantIds: Id<"lessons">[] = [];
+  let queueIndex = 0;
+
+  while (queueIndex < queue.length) {
+    const currentId = queue[queueIndex];
+    queueIndex += 1;
+
+    const children = await db
+      .query("lessons")
+      .withIndex("by_subjectId_and_groupId_and_parentLessonId_and_order", (q) =>
+        q
+          .eq("subjectId", subjectId)
+          .eq("groupId", fromGroupId)
+          .eq("parentLessonId", currentId)
+      )
+      .collect();
+
+    for (const child of children) {
+      descendantIds.push(child._id);
+      queue.push(child._id);
+    }
+  }
+
+  for (const descendantId of descendantIds) {
+    await db.patch(descendantId, {
+      groupId: toGroupId,
+      updatedAt,
+    });
+  }
+};
+
 export const getByRoute = query({
   args: {
     subjectSlug: v.string(),
     lessonSlug: v.string(),
-    includeDrafts: v.optional(v.boolean()),
+    includeUnpublished: v.optional(v.boolean()),
   },
   returns: v.union(
     v.object({
@@ -132,7 +177,7 @@ export const getByRoute = query({
       return null;
     }
 
-    if (!args.includeDrafts && lesson.status !== "published") {
+    if (!args.includeUnpublished && lesson.status !== "published") {
       return null;
     }
 
@@ -143,7 +188,7 @@ export const getByRoute = query({
 export const getSidebarTree = query({
   args: {
     subjectId: v.id("subjects"),
-    includeDrafts: v.optional(v.boolean()),
+    includeUnpublished: v.optional(v.boolean()),
   },
   returns: v.object({
     groups: v.array(lessonGroupWithItemsValidator),
@@ -164,7 +209,7 @@ export const getSidebarTree = query({
     const lessons = await getLessonsByVisibility(
       ctx.db,
       args.subjectId,
-      args.includeDrafts ?? false
+      args.includeUnpublished ?? false
     );
 
     const byId = new Map(
@@ -177,6 +222,8 @@ export const getSidebarTree = query({
       if (lesson.parentLessonId) {
         const parent = byId.get(lesson.parentLessonId);
         if (!parent) {
+          // Intentional: when includeUnpublished=false, non-visible parents are not in
+          // byId, so their descendants are hidden from the sidebar as a subtree.
           continue;
         }
         if (parent.groupId !== lesson.groupId) {
@@ -479,6 +526,18 @@ export const move = mutation({
       order,
       updatedAt,
     });
+
+    if (targetGroupId !== lesson.groupId) {
+      await moveDescendantsToGroup(
+        ctx.db,
+        lesson.subjectId,
+        lesson.groupId,
+        targetGroupId,
+        lesson._id,
+        updatedAt
+      );
+    }
+
     return {
       _id: lesson._id,
       uid: lesson.uid,
@@ -544,12 +603,11 @@ export const removeSubtree = mutation({
     const queue: Id<"lessons">[] = [subtreeRootLesson._id];
     const toDelete: Id<"lessons">[] = [subtreeRootLesson._id];
     const deletedLessonUids: string[] = [subtreeRootLesson.uid];
+    let queueIndex = 0;
 
-    while (queue.length > 0) {
-      const currentId = queue.shift();
-      if (currentId === undefined) {
-        break;
-      }
+    while (queueIndex < queue.length) {
+      const currentId = queue[queueIndex];
+      queueIndex += 1;
 
       // Invariant: create/move enforce that a lesson and all descendants stay in
       // the same subject + group. This query relies on that for efficient subtree

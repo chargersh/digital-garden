@@ -52,6 +52,11 @@ export const create = mutation({
     const title = normalizeRequired(args.title, "title");
     const slug = normalizeRequired(args.slug, "slug");
 
+    const subject = await ctx.db.get(args.subjectId);
+    if (!subject) {
+      throw new Error(`Subject "${args.subjectId}" was not found.`);
+    }
+
     await assertUniqueLessonGroupUid(ctx.db, args.subjectId, uid);
     await assertUniqueLessonGroupSlug(ctx.db, args.subjectId, slug);
 
