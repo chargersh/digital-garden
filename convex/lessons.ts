@@ -97,6 +97,92 @@ const getLessonsByVisibility = async (
     .collect();
 };
 
+const buildSidebarTree = async (
+  ctx: {
+    db: DatabaseReader;
+  },
+  subject: Doc<"subjects">,
+  includeUnpublished: boolean
+): Promise<{
+  groups: Array<Doc<"lessonGroups"> & { items: SidebarNode[] }>;
+}> => {
+  const groups = await ctx.db
+    .query("lessonGroups")
+    .withIndex("by_subjectId_and_order", (q) => q.eq("subjectId", subject._id))
+    .collect();
+
+  const lessons = await getLessonsByVisibility(
+    ctx.db,
+    subject._id,
+    includeUnpublished
+  );
+
+  const byId = new Map(lessons.map((lesson) => [lesson._id, lesson] as const));
+  const children = new Map<Id<"lessons">, LessonDoc[]>();
+  const rootsByGroup = new Map<Id<"lessonGroups">, LessonDoc[]>();
+
+  for (const lesson of lessons) {
+    if (lesson.parentLessonId) {
+      const parent = byId.get(lesson.parentLessonId);
+      if (!parent) {
+        // Intentional: when includeUnpublished=false, non-visible parents are not in
+        // byId, so their descendants are hidden from the sidebar as a subtree.
+        continue;
+      }
+      if (parent.groupId !== lesson.groupId) {
+        throw new Error(
+          `Lesson "${lesson._id}" has parent in different group.`
+        );
+      }
+      const bucket = children.get(lesson.parentLessonId) ?? [];
+      bucket.push(lesson);
+      children.set(lesson.parentLessonId, bucket);
+      continue;
+    }
+    const bucket = rootsByGroup.get(lesson.groupId) ?? [];
+    bucket.push(lesson);
+    rootsByGroup.set(lesson.groupId, bucket);
+  }
+
+  const byOrder = (a: LessonDoc, b: LessonDoc) =>
+    a.order === b.order ? a.title.localeCompare(b.title) : a.order - b.order;
+
+  for (const bucket of children.values()) {
+    bucket.sort(byOrder);
+  }
+  for (const bucket of rootsByGroup.values()) {
+    bucket.sort(byOrder);
+  }
+
+  const buildNode = (lessonId: Id<"lessons">): SidebarNode => {
+    const lesson = byId.get(lessonId);
+    if (!lesson) {
+      throw new Error(`Lesson "${lessonId}" not found while building tree.`);
+    }
+    const nested: SidebarNode[] = (children.get(lessonId) ?? []).map((child) =>
+      buildNode(child._id)
+    );
+    return {
+      id: lesson._id,
+      uid: lesson.uid,
+      title: lesson.title,
+      lessonSlug: lesson.lessonSlug,
+      href: `/${subject.slug}/${lesson.lessonSlug}`,
+      status: lesson.status,
+      ...(nested.length > 0 ? { items: nested } : {}),
+    };
+  };
+
+  return {
+    groups: groups.map((group) => ({
+      ...group,
+      items: (rootsByGroup.get(group._id) ?? []).map((lesson) =>
+        buildNode(lesson._id)
+      ),
+    })),
+  };
+};
+
 const moveDescendantsToGroup = async (
   db: DatabaseReader & {
     patch: (
@@ -185,7 +271,7 @@ export const getByRoute = query({
   },
 });
 
-export const getSidebarTree = query({
+export const getSidebarTreeById = query({
   args: {
     subjectId: v.id("subjects"),
     includeUnpublished: v.optional(v.boolean()),
@@ -198,86 +284,36 @@ export const getSidebarTree = query({
     if (!subject) {
       throw new Error(`Subject "${args.subjectId}" was not found.`);
     }
-
-    const groups = await ctx.db
-      .query("lessonGroups")
-      .withIndex("by_subjectId_and_order", (q) =>
-        q.eq("subjectId", args.subjectId)
-      )
-      .collect();
-
-    const lessons = await getLessonsByVisibility(
-      ctx.db,
-      args.subjectId,
+    return await buildSidebarTree(
+      ctx,
+      subject,
       args.includeUnpublished ?? false
     );
+  },
+});
 
-    const byId = new Map(
-      lessons.map((lesson) => [lesson._id, lesson] as const)
+export const getSidebarTreeBySubjectSlug = query({
+  args: {
+    subjectSlug: v.string(),
+    includeUnpublished: v.optional(v.boolean()),
+  },
+  returns: v.object({
+    groups: v.array(lessonGroupWithItemsValidator),
+  }),
+  handler: async (ctx, args) => {
+    const subjectSlug = normalizeRequired(args.subjectSlug, "subjectSlug");
+    const subject = await ctx.db
+      .query("subjects")
+      .withIndex("by_slug", (q) => q.eq("slug", subjectSlug))
+      .unique();
+    if (!subject) {
+      throw new Error(`Subject slug "${subjectSlug}" was not found.`);
+    }
+    return await buildSidebarTree(
+      ctx,
+      subject,
+      args.includeUnpublished ?? false
     );
-    const children = new Map<Id<"lessons">, LessonDoc[]>();
-    const rootsByGroup = new Map<Id<"lessonGroups">, LessonDoc[]>();
-
-    for (const lesson of lessons) {
-      if (lesson.parentLessonId) {
-        const parent = byId.get(lesson.parentLessonId);
-        if (!parent) {
-          // Intentional: when includeUnpublished=false, non-visible parents are not in
-          // byId, so their descendants are hidden from the sidebar as a subtree.
-          continue;
-        }
-        if (parent.groupId !== lesson.groupId) {
-          throw new Error(
-            `Lesson "${lesson._id}" has parent in different group.`
-          );
-        }
-        const bucket = children.get(lesson.parentLessonId) ?? [];
-        bucket.push(lesson);
-        children.set(lesson.parentLessonId, bucket);
-        continue;
-      }
-      const bucket = rootsByGroup.get(lesson.groupId) ?? [];
-      bucket.push(lesson);
-      rootsByGroup.set(lesson.groupId, bucket);
-    }
-
-    const byOrder = (a: LessonDoc, b: LessonDoc) =>
-      a.order === b.order ? a.title.localeCompare(b.title) : a.order - b.order;
-
-    for (const bucket of children.values()) {
-      bucket.sort(byOrder);
-    }
-    for (const bucket of rootsByGroup.values()) {
-      bucket.sort(byOrder);
-    }
-
-    const buildNode = (lessonId: Id<"lessons">): SidebarNode => {
-      const lesson = byId.get(lessonId);
-      if (!lesson) {
-        throw new Error(`Lesson "${lessonId}" not found while building tree.`);
-      }
-      const nested: SidebarNode[] = (children.get(lessonId) ?? []).map(
-        (child) => buildNode(child._id)
-      );
-      return {
-        id: lesson._id,
-        uid: lesson.uid,
-        title: lesson.title,
-        lessonSlug: lesson.lessonSlug,
-        href: `/${subject.slug}/${lesson.lessonSlug}`,
-        status: lesson.status,
-        ...(nested.length > 0 ? { items: nested } : {}),
-      };
-    };
-
-    return {
-      groups: groups.map((group) => ({
-        ...group,
-        items: (rootsByGroup.get(group._id) ?? []).map((lesson) =>
-          buildNode(lesson._id)
-        ),
-      })),
-    };
   },
 });
 

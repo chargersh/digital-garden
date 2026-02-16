@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ModeToggle } from "@/components/mode-toggle";
 import {
   Breadcrumb,
@@ -21,11 +22,15 @@ export function PageHeader() {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink href="/">Home</BreadcrumbLink>
+                <BreadcrumbLink asChild>
+                  <Link href="/">Home</Link>
+                </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbLink href="/">Subjects</BreadcrumbLink>
+                <BreadcrumbLink asChild>
+                  <Link href="/">Subjects</Link>
+                </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>

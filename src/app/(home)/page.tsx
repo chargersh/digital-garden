@@ -1,8 +1,23 @@
-import Link from "next/link";
-import { getSubjects } from "@/features/convex/server-queries";
+"use client";
 
-export default async function HomePage() {
-  const subjects = await getSubjects();
+import { api } from "@convex/_generated/api";
+import { useQuery } from "convex/react";
+import Link from "next/link";
+
+export default function HomePage() {
+  // Temporary: keep subject list query here until home page work starts,
+  // then extract this into a dedicated subject-list component.
+  const subjects = useQuery(api.subjects.list, {});
+
+  if (subjects === undefined) {
+    return (
+      <div className="mx-auto flex w-full max-w-4xl flex-col px-4 py-10 lg:px-14">
+        <div className="rounded-xl border bg-card p-6">
+          <h1 className="font-semibold text-2xl tracking-tight">Loading...</h1>
+        </div>
+      </div>
+    );
+  }
 
   if (subjects.length === 0) {
     return (
