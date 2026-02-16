@@ -1,8 +1,5 @@
 "use client";
 
-import { api } from "@convex/_generated/api";
-import type { Id } from "@convex/_generated/dataModel";
-import { useQuery } from "convex/react";
 import { GalleryVerticalEnd } from "lucide-react";
 import Link from "next/link";
 import type { ComponentProps } from "react";
@@ -15,35 +12,12 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { useSubjectSidebar } from "@/features/sidebar/subject-sidebar-context";
 import { SidebarLessonGroup } from "./components/lesson-group";
 import { LessonItem } from "./components/lesson-item";
-import type { LessonGroup } from "./types";
 
-interface AppSidebarProps extends ComponentProps<typeof Sidebar> {
-  subjectId: Id<"subjects">;
-  subjectSlug: string;
-}
-
-export function AppSidebar({
-  subjectId,
-  subjectSlug,
-  ...props
-}: AppSidebarProps) {
-  const sidebarTree = useQuery(api.lessons.getSidebarTreeById, {
-    subjectId,
-  });
-
-  const lessonGroups: LessonGroup[] = sidebarTree
-    ? sidebarTree.groups.map((group) => ({
-        title: group.title,
-        order: group.order,
-        id: `group-${group.uid}`,
-        items: group.items,
-      }))
-    : [];
-
-  const status: "loading" | "ready" =
-    sidebarTree === undefined ? "loading" : "ready";
+export function AppSidebar(props: ComponentProps<typeof Sidebar>) {
+  const { lessonGroups, status, subjectSlug } = useSubjectSidebar();
 
   return (
     <Sidebar {...props}>

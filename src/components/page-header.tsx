@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { Fragment } from "react";
 import { ModeToggle } from "@/components/mode-toggle";
 import {
   Breadcrumb,
@@ -9,8 +12,11 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { useSubjectSidebar } from "@/features/sidebar/subject-sidebar-context";
 
 export function PageHeader() {
+  const { breadcrumbItems } = useSubjectSidebar();
+
   return (
     <header className="sticky top-0 z-20 border-border/60 border-b bg-background/80 backdrop-blur supports-backdrop-filter:bg-background/70">
       <div className="flex h-12 items-center gap-4 px-4 text-foreground lg:px-14">
@@ -26,16 +32,23 @@ export function PageHeader() {
                   <Link href="/">Home</Link>
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <Link href="/">Subjects</Link>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>Learning</BreadcrumbPage>
-              </BreadcrumbItem>
+              {breadcrumbItems.map((item, index) => {
+                const isLast = index === breadcrumbItems.length - 1;
+                return (
+                  <Fragment key={`${item.href ?? ""}-${item.title}`}>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      {isLast || !item.href ? (
+                        <BreadcrumbPage>{item.title}</BreadcrumbPage>
+                      ) : (
+                        <BreadcrumbLink asChild>
+                          <Link href={item.href}>{item.title}</Link>
+                        </BreadcrumbLink>
+                      )}
+                    </BreadcrumbItem>
+                  </Fragment>
+                );
+              })}
             </BreadcrumbList>
           </Breadcrumb>
         </div>

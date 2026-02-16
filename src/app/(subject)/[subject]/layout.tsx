@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { PageHeader } from "@/components/page-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/features/sidebar/app-sidebar";
+import { SubjectSidebarProvider } from "@/features/sidebar/subject-sidebar-context";
 
 interface SubjectLayoutProps {
   children: ReactNode;
@@ -28,11 +29,17 @@ export default async function SubjectLayout({
 
   return (
     <SidebarProvider>
-      <AppSidebar subjectId={subject._id} subjectSlug={subjectSlug} />
-      <SidebarInset>
-        <PageHeader />
-        {children}
-      </SidebarInset>
+      <SubjectSidebarProvider
+        subjectId={subject._id}
+        subjectName={subject.name}
+        subjectSlug={subject.slug}
+      >
+        <AppSidebar />
+        <SidebarInset>
+          <PageHeader />
+          {children}
+        </SidebarInset>
+      </SubjectSidebarProvider>
     </SidebarProvider>
   );
 }
