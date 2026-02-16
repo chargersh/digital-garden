@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import type { CSSProperties } from "react";
 
 import { SidebarMenuSubButton } from "@/components/ui/sidebar";
@@ -9,9 +12,7 @@ interface LessonItemProps {
   title: string;
   href: string;
   id?: string;
-  dataTitle?: string;
   depth?: number;
-  isActive?: boolean;
   className?: string;
 }
 
@@ -19,17 +20,17 @@ export function LessonItem({
   title,
   href,
   id,
-  dataTitle,
   depth = 0,
-  isActive = false,
   className,
 }: LessonItemProps) {
   const Item = getMenuItemComponent(depth);
+  const pathname = usePathname();
+  const isActive = pathname === href;
 
   return (
     <Item
       className="scroll-m-4 first:scroll-m-20"
-      data-title={dataTitle ?? title}
+      data-title={title}
       id={id ?? href}
     >
       <SidebarMenuSubButton

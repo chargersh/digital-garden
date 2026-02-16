@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "../styles/globals.css";
-import { PageHeader } from "@/components/page-header";
 import { ThemeProvider } from "@/components/theme-provider";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/features/sidebar/app-sidebar";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -43,13 +40,7 @@ export default function RootLayout({
           disableTransitionOnChange
           enableSystem
         >
-          <SidebarProvider>
-            <AppSidebar />
-            <SidebarInset>
-              <PageHeader />
-              {children}
-            </SidebarInset>
-          </SidebarProvider>
+          {children}
         </ThemeProvider>
       </body>
     </html>

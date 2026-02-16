@@ -1,8 +1,5 @@
-import { redirect } from "next/navigation";
-import {
-  getCanonicalLessonRoute,
-  getMockLesson,
-} from "@/features/mdx/load-lesson-mock";
+import { notFound } from "next/navigation";
+import { getConvexLesson } from "@/features/mdx/load-lesson-convex";
 import { getMDXComponents } from "@/features/mdx/mdx-components";
 import { TableOfContents } from "@/features/toc/table-of-contents";
 
@@ -16,14 +13,14 @@ interface LessonPageProps {
 }
 
 export default async function LessonPage({ params }: LessonPageProps) {
-  const canonicalRoute = getCanonicalLessonRoute();
-  const [{ subject, lesson }, compiledLesson] = await Promise.all([
-    params,
-    getMockLesson(),
-  ]);
+  const { subject, lesson } = await params;
+  const compiledLesson = await getConvexLesson({
+    subjectSlug: subject,
+    lessonSlug: lesson,
+  });
 
-  if (subject !== canonicalRoute.subject || lesson !== canonicalRoute.lesson) {
-    redirect(canonicalRoute.url);
+  if (!compiledLesson) {
+    notFound();
   }
 
   const Body = compiledLesson.body;

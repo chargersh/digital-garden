@@ -1,17 +1,8 @@
 import { SidebarMenu, SidebarMenuSub } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
+import type { LessonNode } from "../types";
 import { LessonCollapsible } from "./lesson-collapsible";
 import { LessonItem } from "./lesson-item";
-
-export interface LessonNode {
-  title: string;
-  href?: string;
-  items?: LessonNode[];
-  id?: string;
-  dataTitle?: string;
-  defaultOpen?: boolean;
-  isActive?: boolean;
-}
 
 interface LessonTreeProps {
   items: LessonNode[];
@@ -40,8 +31,6 @@ export function LessonTree({
         if (hasChildren && item.items) {
           return (
             <LessonCollapsible
-              dataTitle={item.dataTitle}
-              defaultOpen={item.defaultOpen}
               depth={depth}
               id={item.id}
               key={key}
@@ -58,11 +47,9 @@ export function LessonTree({
 
         return (
           <LessonItem
-            dataTitle={item.dataTitle}
             depth={depth}
             href={item.href}
             id={item.id}
-            isActive={item.isActive}
             key={key}
             title={item.title}
           />

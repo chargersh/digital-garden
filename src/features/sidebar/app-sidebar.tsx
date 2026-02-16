@@ -9,10 +9,14 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { LessonGroup } from "./components/lesson-group";
-import { lessonGroups } from "./lesson-data";
+import { SidebarLessonGroup } from "./components/lesson-group";
+import type { LessonGroup } from "./types";
 
-export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
+interface AppSidebarProps extends ComponentProps<typeof Sidebar> {
+  lessonGroups: LessonGroup[];
+}
+
+export function AppSidebar({ lessonGroups, ...props }: AppSidebarProps) {
   return (
     <Sidebar {...props}>
       <SidebarHeader>
@@ -33,15 +37,21 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent className="custom-scrollbar stable-scrollbar-gutter flex-1 overflow-y-auto pb-6">
-        {lessonGroups.map((group, index) => (
-          <LessonGroup
-            className={index === 0 ? "mt-0 lg:mt-0" : undefined}
-            id={group.id}
-            items={group.items}
-            key={group.title}
-            title={group.title}
-          />
-        ))}
+        {lessonGroups.length === 0 ? (
+          <div className="px-4 py-3 text-muted-foreground text-sm">
+            No lessons yet.
+          </div>
+        ) : (
+          lessonGroups.map((group, index) => (
+            <SidebarLessonGroup
+              className={index === 0 ? "mt-0 lg:mt-0" : undefined}
+              id={group.id}
+              items={group.items}
+              key={group.title}
+              title={group.title}
+            />
+          ))
+        )}
       </SidebarContent>
     </Sidebar>
   );

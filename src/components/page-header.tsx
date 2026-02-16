@@ -25,11 +25,11 @@ export function PageHeader() {
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbLink href="/lessons">Lessons</BreadcrumbLink>
+                <BreadcrumbLink href="/">Subjects</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbPage>Overview</BreadcrumbPage>
+                <BreadcrumbPage>Learning</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
