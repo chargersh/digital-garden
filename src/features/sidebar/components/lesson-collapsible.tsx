@@ -14,8 +14,6 @@ interface LessonCollapsibleProps {
   children: ReactNode;
   depth?: number;
   id?: string;
-  dataTitle?: string;
-  defaultOpen?: boolean;
   className?: string;
 }
 
@@ -24,19 +22,13 @@ export function LessonCollapsible({
   children,
   depth = 0,
   id,
-  dataTitle,
-  defaultOpen = true,
   className,
 }: LessonCollapsibleProps) {
   const Item = getMenuItemComponent(depth);
 
   return (
-    <Collapsible defaultOpen={defaultOpen}>
-      <Item
-        className="scroll-m-4 first:scroll-m-20"
-        data-title={dataTitle ?? title}
-        id={id}
-      >
+    <Collapsible defaultOpen>
+      <Item className="scroll-m-4 first:scroll-m-20" data-title={title} id={id}>
         <CollapsibleTrigger asChild>
           <SidebarMenuSubButton
             asChild

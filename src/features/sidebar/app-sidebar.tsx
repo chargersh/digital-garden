@@ -1,4 +1,7 @@
+"use client";
+
 import { GalleryVerticalEnd } from "lucide-react";
+import Link from "next/link";
 import type { ComponentProps } from "react";
 
 import {
@@ -9,17 +12,20 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { LessonGroup } from "./components/lesson-group";
-import { lessonGroups } from "./lesson-data";
+import { useSubjectSidebar } from "@/features/sidebar/subject-sidebar-context";
+import { SidebarLessonGroup } from "./components/lesson-group";
+import { LessonItem } from "./components/lesson-item";
 
-export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
+export function AppSidebar(props: ComponentProps<typeof Sidebar>) {
+  const { lessonGroups, status, subjectSlug } = useSubjectSidebar();
+
   return (
     <Sidebar {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild size="lg">
-              <a href="/">
+              <Link href="/">
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                   <GalleryVerticalEnd className="size-4" />
                 </div>
@@ -27,21 +33,41 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
                   <span className="font-medium">Documentation</span>
                   <span className="text-muted-foreground text-xs">v1.0.0</span>
                 </div>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent className="custom-scrollbar stable-scrollbar-gutter flex-1 overflow-y-auto pb-6">
-        {lessonGroups.map((group, index) => (
-          <LessonGroup
-            className={index === 0 ? "mt-0 lg:mt-0" : undefined}
-            id={group.id}
-            items={group.items}
-            key={group.title}
-            title={group.title}
+        {status === "loading" && (
+          <div className="px-4 py-3 text-muted-foreground text-sm">
+            Loading...
+          </div>
+        )}
+        {status === "ready" && (
+          <LessonItem
+            className="mt-0 lg:mt-0"
+            href={`/${subjectSlug}`}
+            id={`overview-${subjectSlug}`}
+            title="Overview"
           />
-        ))}
+        )}
+        {status === "ready" && lessonGroups.length === 0 && (
+          <div className="px-4 py-3 text-muted-foreground text-sm">
+            No lessons yet.
+          </div>
+        )}
+        {status === "ready" &&
+          lessonGroups.length > 0 &&
+          lessonGroups.map((group, index) => (
+            <SidebarLessonGroup
+              className={index === 0 ? "mt-0 lg:mt-0" : undefined}
+              id={group.id}
+              items={group.items}
+              key={group.id}
+              title={group.title}
+            />
+          ))}
       </SidebarContent>
     </Sidebar>
   );

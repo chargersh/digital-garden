@@ -4,7 +4,8 @@ import {
   SidebarGroupLabel,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
-import { type LessonNode, LessonTree } from "./lesson-tree";
+import type { LessonNode } from "../types";
+import { LessonTree } from "./lesson-tree";
 
 interface LessonGroupProps {
   title: string;
@@ -13,7 +14,12 @@ interface LessonGroupProps {
   className?: string;
 }
 
-export function LessonGroup({ title, items, id, className }: LessonGroupProps) {
+export function SidebarLessonGroup({
+  title,
+  items,
+  id,
+  className,
+}: LessonGroupProps) {
   return (
     <SidebarGroup className={cn("mt-4 p-0 lg:mt-5", className)}>
       <SidebarGroupLabel
