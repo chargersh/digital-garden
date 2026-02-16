@@ -12,3 +12,9 @@ export const getLessonByRoute = async (
     includeUnpublished: false,
   });
 };
+
+export const getSubjectBySlug = async (subjectSlug: string) => {
+  return await fetchQuery(api.subjects.getBySlug, {
+    slug: subjectSlug,
+  });
+};

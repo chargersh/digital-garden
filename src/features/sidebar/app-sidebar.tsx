@@ -64,7 +64,7 @@ export function AppSidebar(props: ComponentProps<typeof Sidebar>) {
               className={index === 0 ? "mt-0 lg:mt-0" : undefined}
               id={group.id}
               items={group.items}
-              key={group.title}
+              key={group.id}
               title={group.title}
             />
           ))}

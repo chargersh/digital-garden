@@ -50,15 +50,9 @@ export default function HomePage() {
             key={subject.uid}
           >
             <h2 className="font-medium text-lg">{subject.name}</h2>
-            {subject.description ? (
-              <p className="mt-2 text-muted-foreground text-sm">
-                {subject.description}
-              </p>
-            ) : (
-              <p className="mt-2 text-muted-foreground text-sm">
-                No description yet.
-              </p>
-            )}
+            <p className="mt-2 text-muted-foreground text-sm">
+              {subject.description || "No description yet."}
+            </p>
           </Link>
         ))}
       </div>

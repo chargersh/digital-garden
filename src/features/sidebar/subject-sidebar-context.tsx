@@ -125,7 +125,7 @@ export function SubjectSidebarProvider({
 
     let lessonTrail: LessonNode[] = [];
     for (const group of sidebarTree.groups) {
-      const match = findLessonTrail(group.items as LessonNode[], lessonSlug);
+      const match = findLessonTrail(group.items, lessonSlug);
       if (match) {
         lessonTrail = match;
         break;

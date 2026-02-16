@@ -99,8 +99,16 @@ export const assertNoCycle = async (
   lessonId: Id<"lessons">,
   parentLessonId: Id<"lessons"> | null
 ): Promise<void> => {
+  const MAX_ANCESTOR_DEPTH = 100;
+  let depth = 0;
   let cursor = parentLessonId;
   while (cursor) {
+    depth += 1;
+    if (depth > MAX_ANCESTOR_DEPTH) {
+      throw new Error(
+        "Cycle detection exceeded max depth; possible existing cycle in lesson ancestry."
+      );
+    }
     if (cursor === lessonId) {
       throw new Error("Cannot set a lesson as a child of its own subtree.");
     }
