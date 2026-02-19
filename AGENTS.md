@@ -2,7 +2,7 @@
 
 ## Project
 
-This repository is a personal Digital Garden for university-driven learning. After each university lesson, the owner researches the topic further, explores related concepts, and writes clear teach-back notes so learning is reinforced through teaching. The project is built with Next.js, React, TypeScript, and Bun.
+This repository is a personal Digital Garden for university-driven learning. After each university lesson, the owner researches the topic further, explores related concepts, and writes clear teach-back notes so learning is reinforced through teaching. The project is built with Next.js, React, TypeScript, Convex, and Bun.
 
 ## Command Contract (Bun Only)
 
@@ -26,6 +26,7 @@ This repository is a personal Digital Garden for university-driven learning. Aft
 - State assumptions explicitly when requirements are unclear.
 - Prefer explicit, maintainable TypeScript and clear naming.
 - Do not ask the user to perform steps the agent can do itself.
+- Use relevant skills when writing or updating code.
 
 ## Workflow Rules
 
