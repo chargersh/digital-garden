@@ -10,11 +10,13 @@ import {
   getIndent,
   getMenuItemComponent,
 } from "@/features/sidebar/shared/components/lesson-row-utils";
+import { getStudioStatusBorderClass } from "@/features/sidebar/shared/sidebar-utils";
 import { cn } from "@/lib/utils";
 
 interface StudioLessonCollapsibleProps {
   title: string;
   children: ReactNode;
+  status?: "archived" | "draft" | "published";
   depth?: number;
   id?: string;
   className?: string;
@@ -23,6 +25,7 @@ interface StudioLessonCollapsibleProps {
 export function StudioLessonCollapsible({
   title,
   children,
+  status,
   depth = 0,
   id,
   className,
@@ -40,6 +43,7 @@ export function StudioLessonCollapsible({
               "flex items-center gap-x-3 pr-3 text-left",
               "ml-4 w-[calc(100%-1rem)] border-l py-2 lg:py-1.5",
               "wrap-break-word hyphens-auto",
+              getStudioStatusBorderClass(status),
               "text-muted-foreground",
               "hover:border-foreground hover:text-foreground",
               "hover:bg-transparent active:bg-transparent",

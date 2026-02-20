@@ -76,3 +76,17 @@ export const findLessonTrail = (
 
   return null;
 };
+
+export const getStudioStatusBorderClass = (
+  status?: "archived" | "draft" | "published"
+) => {
+  if (status === "draft") {
+    return "border-yellow-500";
+  }
+
+  if (status === "archived") {
+    return "border-red-500";
+  }
+
+  return "";
+};

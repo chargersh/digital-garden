@@ -34,6 +34,7 @@ export function StudioLessonTree({
               depth={depth}
               id={item.id}
               key={key}
+              status={item.status}
               title={item.title}
             >
               <StudioLessonTree
@@ -55,6 +56,7 @@ export function StudioLessonTree({
             href={item.href}
             id={item.id}
             key={key}
+            status={item.status}
             title={item.title}
           />
         );

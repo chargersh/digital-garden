@@ -3,6 +3,7 @@ export interface LessonNode {
   href?: string;
   items?: LessonNode[];
   id?: string;
+  status?: "archived" | "draft" | "published";
 }
 
 export interface LessonGroup {
