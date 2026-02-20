@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
-import { PageHeader } from "@/components/page-header";
+import { StudioPageHeader } from "@/components/studio-page-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { getSubjectBySlug } from "@/features/convex/server-queries";
 import { SubjectSidebarProvider } from "@/features/sidebar/shared/subject-sidebar-context";
@@ -34,7 +34,7 @@ export default async function StudioSubjectLayout({
       >
         <StudioSidebar />
         <SidebarInset>
-          <PageHeader />
+          <StudioPageHeader />
           {children}
         </SidebarInset>
       </SubjectSidebarProvider>

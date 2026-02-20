@@ -29,12 +29,12 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      className={`${inter.variable} overscroll-none`}
+      className={`${inter.variable} stable-scrollbar-gutter overscroll-none`}
       lang="en"
       suppressHydrationWarning
     >
       <body
-        className={`${geistSans.variable} ${geistMono.variable} custom-scrollbar antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} custom-scrollbar stable-scrollbar-gutter antialiased`}
       >
         <ThemeProvider
           attribute="class"

@@ -204,11 +204,19 @@
   }
 
   .stable-scrollbar-gutter {
-    scrollbar-gutter: stable;
+    scrollbar-gutter: stable both-edges;
   }
 
   .prose
     :where(a):not(:where([class~="not-prose"], [class~="not-prose"] *)):hover {
     opacity: 0.8;
+  }
+
+  .prose > :first-child {
+    margin-top: 0;
+  }
+
+  .prose > :last-child {
+    margin-bottom: 0;
   }
 }
