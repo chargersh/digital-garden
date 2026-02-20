@@ -1,0 +1,64 @@
+import { ChevronRight } from "lucide-react";
+import type { CSSProperties, ReactNode } from "react";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { SidebarMenuSubButton } from "@/components/ui/sidebar";
+import {
+  getIndent,
+  getMenuItemComponent,
+} from "@/features/sidebar/shared/components/lesson-row-utils";
+import { cn } from "@/lib/utils";
+
+interface ReaderLessonCollapsibleProps {
+  title: string;
+  children: ReactNode;
+  depth?: number;
+  id?: string;
+  className?: string;
+}
+
+export function ReaderLessonCollapsible({
+  title,
+  children,
+  depth = 0,
+  id,
+  className,
+}: ReaderLessonCollapsibleProps) {
+  const Item = getMenuItemComponent(depth);
+
+  return (
+    <Collapsible defaultOpen>
+      <Item className="scroll-m-4 first:scroll-m-20" data-title={title} id={id}>
+        <CollapsibleTrigger asChild>
+          <SidebarMenuSubButton
+            asChild
+            className={cn(
+              "group/lesson-toggle h-auto rounded-none px-0 py-0",
+              "flex items-center gap-x-3 pr-3 text-left",
+              "ml-4 w-[calc(100%-1rem)] border-l py-2 lg:py-1.5",
+              "wrap-break-word hyphens-auto",
+              "text-muted-foreground",
+              "hover:border-foreground hover:text-foreground",
+              "hover:bg-transparent active:bg-transparent",
+              className
+            )}
+            style={
+              {
+                paddingLeft: getIndent(depth),
+              } as CSSProperties
+            }
+          >
+            <button aria-label={`Toggle ${title} section`} type="button">
+              <div>{title}</div>
+              <ChevronRight className="-mr-0.5 h-3! w-3! text-muted-foreground! transition-transform duration-75 group-hover/lesson-toggle:text-foreground! group-data-[state=open]/lesson-toggle:rotate-90" />
+            </button>
+          </SidebarMenuSubButton>
+        </CollapsibleTrigger>
+        <CollapsibleContent>{children}</CollapsibleContent>
+      </Item>
+    </Collapsible>
+  );
+}

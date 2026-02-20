@@ -3,23 +3,23 @@ import {
   SidebarGroupContent,
   SidebarGroupLabel,
 } from "@/components/ui/sidebar";
+import type { LessonNode } from "@/features/sidebar/shared/types";
 import { cn } from "@/lib/utils";
-import type { LessonNode } from "../types";
-import { LessonTree } from "./lesson-tree";
+import { StudioLessonTree } from "./studio-lesson-tree";
 
-interface LessonGroupProps {
+interface StudioLessonGroupProps {
   title: string;
   items: LessonNode[];
   id?: string;
   className?: string;
 }
 
-export function SidebarLessonGroup({
+export function StudioLessonGroup({
   title,
   items,
   id,
   className,
-}: LessonGroupProps) {
+}: StudioLessonGroupProps) {
   return (
     <SidebarGroup className={cn("mt-4 p-0 lg:mt-5", className)}>
       <SidebarGroupLabel
@@ -29,7 +29,7 @@ export function SidebarLessonGroup({
         <h5 id={id}>{title}</h5>
       </SidebarGroupLabel>
       <SidebarGroupContent>
-        <LessonTree items={items} />
+        <StudioLessonTree items={items} />
       </SidebarGroupContent>
     </SidebarGroup>
   );

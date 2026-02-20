@@ -12,7 +12,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { useSubjectSidebar } from "@/features/sidebar/subject-sidebar-context";
+import { useSubjectSidebar } from "@/features/sidebar/shared/subject-sidebar-context";
 
 export function PageHeader() {
   const { breadcrumbItems } = useSubjectSidebar();

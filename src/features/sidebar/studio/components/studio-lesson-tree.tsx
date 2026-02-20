@@ -1,22 +1,22 @@
 import { SidebarMenu, SidebarMenuSub } from "@/components/ui/sidebar";
+import type { LessonNode } from "@/features/sidebar/shared/types";
 import { cn } from "@/lib/utils";
-import type { LessonNode } from "../types";
-import { LessonCollapsible } from "./lesson-collapsible";
-import { LessonItem } from "./lesson-item";
+import { StudioLessonCollapsible } from "./studio-lesson-collapsible";
+import { StudioLessonItem } from "./studio-lesson-item";
 
-interface LessonTreeProps {
+interface StudioLessonTreeProps {
   items: LessonNode[];
   depth?: number;
   asSubmenu?: boolean;
   className?: string;
 }
 
-export function LessonTree({
+export function StudioLessonTree({
   items,
   depth = 0,
   asSubmenu = false,
   className,
-}: LessonTreeProps) {
+}: StudioLessonTreeProps) {
   const Container = asSubmenu ? SidebarMenuSub : SidebarMenu;
   const containerClassName = asSubmenu
     ? cn("mx-0 translate-x-0 gap-0 border-0 px-0 py-0", className)
@@ -30,14 +30,18 @@ export function LessonTree({
 
         if (hasChildren && item.items) {
           return (
-            <LessonCollapsible
+            <StudioLessonCollapsible
               depth={depth}
               id={item.id}
               key={key}
               title={item.title}
             >
-              <LessonTree asSubmenu depth={depth + 1} items={item.items} />
-            </LessonCollapsible>
+              <StudioLessonTree
+                asSubmenu
+                depth={depth + 1}
+                items={item.items}
+              />
+            </StudioLessonCollapsible>
           );
         }
 
@@ -46,7 +50,7 @@ export function LessonTree({
         }
 
         return (
-          <LessonItem
+          <StudioLessonItem
             depth={depth}
             href={item.href}
             id={item.id}

@@ -3,15 +3,19 @@ import { compileMdxFile } from "@/features/mdx/compile";
 import type { CompiledLessonContent } from "@/features/mdx/types";
 
 interface LoadLessonConvexInput {
+  includeUnpublished?: boolean;
   subjectSlug: string;
   lessonSlug: string;
 }
 
 export const getConvexLesson = async ({
+  includeUnpublished,
   subjectSlug,
   lessonSlug,
 }: LoadLessonConvexInput): Promise<CompiledLessonContent | null> => {
-  const result = await getLessonByRoute(subjectSlug, lessonSlug);
+  const result = await getLessonByRoute(subjectSlug, lessonSlug, {
+    includeUnpublished,
+  });
   if (!result) {
     return null;
   }

@@ -5,10 +5,13 @@ import { usePathname } from "next/navigation";
 import type { CSSProperties } from "react";
 
 import { SidebarMenuSubButton } from "@/components/ui/sidebar";
+import {
+  getIndent,
+  getMenuItemComponent,
+} from "@/features/sidebar/shared/components/lesson-row-utils";
 import { cn } from "@/lib/utils";
-import { getIndent, getMenuItemComponent } from "./lesson-row-utils";
 
-interface LessonItemProps {
+interface StudioLessonItemProps {
   title: string;
   href: string;
   id?: string;
@@ -16,13 +19,13 @@ interface LessonItemProps {
   className?: string;
 }
 
-export function LessonItem({
+export function StudioLessonItem({
   title,
   href,
   id,
   depth = 0,
   className,
-}: LessonItemProps) {
+}: StudioLessonItemProps) {
   const Item = getMenuItemComponent(depth);
   const pathname = usePathname();
   const isActive = pathname === href;

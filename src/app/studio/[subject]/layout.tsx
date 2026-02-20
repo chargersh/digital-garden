@@ -3,20 +3,20 @@ import type { ReactNode } from "react";
 import { PageHeader } from "@/components/page-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { getSubjectBySlug } from "@/features/convex/server-queries";
-import { ReaderSidebar } from "@/features/sidebar/reader/reader-sidebar";
 import { SubjectSidebarProvider } from "@/features/sidebar/shared/subject-sidebar-context";
+import { StudioSidebar } from "@/features/sidebar/studio/studio-sidebar";
 
-interface SubjectLayoutProps {
+interface StudioSubjectLayoutProps {
   children: ReactNode;
   params: Promise<{
     subject: string;
   }>;
 }
 
-export default async function SubjectLayout({
+export default async function StudioSubjectLayout({
   children,
   params,
-}: SubjectLayoutProps) {
+}: StudioSubjectLayoutProps) {
   const { subject: subjectSlug } = await params;
   const subject = await getSubjectBySlug(subjectSlug);
 
@@ -27,12 +27,12 @@ export default async function SubjectLayout({
   return (
     <SidebarProvider>
       <SubjectSidebarProvider
-        includeUnpublished={false}
+        includeUnpublished
         subjectId={subject._id}
         subjectName={subject.name}
         subjectSlug={subject.slug}
       >
-        <ReaderSidebar />
+        <StudioSidebar />
         <SidebarInset>
           <PageHeader />
           {children}

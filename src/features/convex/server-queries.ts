@@ -4,12 +4,15 @@ import { fetchQuery } from "convex/nextjs";
 
 export const getLessonByRoute = async (
   subjectSlug: string,
-  lessonSlug: string
+  lessonSlug: string,
+  options?: {
+    includeUnpublished?: boolean;
+  }
 ) => {
   return await fetchQuery(api.lessons.getByRoute, {
     subjectSlug,
     lessonSlug,
-    includeUnpublished: false,
+    includeUnpublished: options?.includeUnpublished ?? false,
   });
 };
 

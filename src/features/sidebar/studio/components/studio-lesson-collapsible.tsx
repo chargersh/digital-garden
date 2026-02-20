@@ -6,10 +6,13 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { SidebarMenuSubButton } from "@/components/ui/sidebar";
+import {
+  getIndent,
+  getMenuItemComponent,
+} from "@/features/sidebar/shared/components/lesson-row-utils";
 import { cn } from "@/lib/utils";
-import { getIndent, getMenuItemComponent } from "./lesson-row-utils";
 
-interface LessonCollapsibleProps {
+interface StudioLessonCollapsibleProps {
   title: string;
   children: ReactNode;
   depth?: number;
@@ -17,13 +20,13 @@ interface LessonCollapsibleProps {
   className?: string;
 }
 
-export function LessonCollapsible({
+export function StudioLessonCollapsible({
   title,
   children,
   depth = 0,
   id,
   className,
-}: LessonCollapsibleProps) {
+}: StudioLessonCollapsibleProps) {
   const Item = getMenuItemComponent(depth);
 
   return (

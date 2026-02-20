@@ -3,7 +3,7 @@
 import { api } from "@convex/_generated/api";
 import { useQuery } from "convex/react";
 import { BookOpenIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Select,
   SelectItem,
@@ -11,20 +11,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { buildSubjectHref, getRoutePrefixFromPathname } from "../sidebar-utils";
 
 interface SubjectSelectorProps {
+  subjectName: string;
   subjectSlug: string;
 }
 
-export function SubjectSelector({ subjectSlug }: SubjectSelectorProps) {
+export function SubjectSelector({
+  subjectName,
+  subjectSlug,
+}: SubjectSelectorProps) {
+  const pathname = usePathname();
   const router = useRouter();
   const subjects = useQuery(api.subjects.list, {});
+  const routePrefix = getRoutePrefixFromPathname(pathname);
   const selectId = `subject-selector-${subjectSlug}`;
-  const subjectItems =
-    subjects?.map((subject) => ({
-      label: subject.name,
-      value: subject.slug,
-    })) ?? [];
+  const subjectItems = subjects
+    ? subjects.map((subject) => ({
+        label: subject.name,
+        value: subject.slug,
+      }))
+    : [{ label: subjectName, value: subjectSlug }];
 
   return (
     <Select
@@ -36,7 +44,7 @@ export function SubjectSelector({ subjectSlug }: SubjectSelectorProps) {
         if (!value || value === subjectSlug) {
           return;
         }
-        router.push(`/${value}`);
+        router.push(buildSubjectHref(value, routePrefix));
       }}
       value={subjectSlug}
     >

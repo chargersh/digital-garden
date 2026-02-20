@@ -5,6 +5,15 @@ import type { Id } from "@convex/_generated/dataModel";
 import { useQuery } from "convex/react";
 import { usePathname } from "next/navigation";
 import { createContext, useContext, useMemo } from "react";
+import {
+  buildSubjectHref,
+  findLessonTrail,
+  getLessonSlugFromPathname,
+  getRoutePrefixFromPathname,
+  mapNodeForRoute,
+  normalizePathname,
+  slugToLabel,
+} from "./sidebar-utils";
 import type { LessonGroup, LessonNode } from "./types";
 
 interface BreadcrumbItem {
@@ -16,6 +25,8 @@ interface SubjectSidebarContextValue {
   breadcrumbItems: BreadcrumbItem[];
   lessonGroups: LessonGroup[];
   status: "loading" | "ready";
+  subjectHref: string;
+  subjectName: string;
   subjectSlug: string;
 }
 
@@ -23,45 +34,9 @@ const SubjectSidebarContext = createContext<SubjectSidebarContextValue | null>(
   null
 );
 
-const slugToLabel = (slug: string) => {
-  return decodeURIComponent(slug).replace(/-/g, " ");
-};
-
-const getLessonSlugFromHref = (href?: string) => {
-  if (!href) {
-    return null;
-  }
-
-  const segments = href.split("/").filter(Boolean);
-  return segments[1] ?? null;
-};
-
-const findLessonTrail = (
-  nodes: LessonNode[],
-  lessonSlug: string,
-  trail: LessonNode[] = []
-): LessonNode[] | null => {
-  for (const node of nodes) {
-    const nextTrail = [...trail, node];
-    if (getLessonSlugFromHref(node.href) === lessonSlug) {
-      return nextTrail;
-    }
-
-    if (!node.items?.length) {
-      continue;
-    }
-
-    const nestedMatch = findLessonTrail(node.items, lessonSlug, nextTrail);
-    if (nestedMatch) {
-      return nestedMatch;
-    }
-  }
-
-  return null;
-};
-
 interface SubjectSidebarProviderProps {
   children: React.ReactNode;
+  includeUnpublished?: boolean;
   subjectId: Id<"subjects">;
   subjectName: string;
   subjectSlug: string;
@@ -69,11 +44,13 @@ interface SubjectSidebarProviderProps {
 
 export function SubjectSidebarProvider({
   children,
+  includeUnpublished = false,
   subjectId,
   subjectName,
   subjectSlug,
 }: SubjectSidebarProviderProps) {
   const sidebarTree = useQuery(api.lessons.getSidebarTreeById, {
+    includeUnpublished,
     subjectId,
   });
   const pathname = usePathname();
@@ -91,22 +68,33 @@ export function SubjectSidebarProvider({
         }))
       : [];
 
-    const segments = pathname.split("/").filter(Boolean);
-    const lessonSlug =
-      segments.length > 1 && segments[0] === subjectSlug ? segments[1] : null;
+    const normalizedPathname = normalizePathname(pathname);
+    const routePrefix = getRoutePrefixFromPathname(normalizedPathname);
+    const lessonSlug = getLessonSlugFromPathname(
+      normalizedPathname,
+      subjectSlug,
+      routePrefix
+    );
+    const subjectHref = buildSubjectHref(subjectSlug, routePrefix);
+    const routedLessonGroups = lessonGroups.map((group) => ({
+      ...group,
+      items: group.items.map((item) => mapNodeForRoute(item, routePrefix)),
+    }));
 
     const breadcrumbItems: BreadcrumbItem[] = [
       {
         title: subjectName,
-        href: `/${subjectSlug}`,
+        href: subjectHref,
       },
     ];
 
     if (!lessonSlug) {
       return {
         breadcrumbItems,
-        lessonGroups,
+        lessonGroups: routedLessonGroups,
         status,
+        subjectHref,
+        subjectName,
         subjectSlug,
       };
     }
@@ -115,17 +103,19 @@ export function SubjectSidebarProvider({
       return {
         breadcrumbItems: [
           ...breadcrumbItems,
-          { title: slugToLabel(lessonSlug), href: pathname },
+          { title: slugToLabel(lessonSlug), href: normalizedPathname },
         ],
-        lessonGroups,
+        lessonGroups: routedLessonGroups,
         status,
+        subjectHref,
+        subjectName,
         subjectSlug,
       };
     }
 
     let lessonTrail: LessonNode[] = [];
-    for (const group of sidebarTree.groups) {
-      const match = findLessonTrail(group.items, lessonSlug);
+    for (const group of routedLessonGroups) {
+      const match = findLessonTrail(group.items, normalizedPathname);
       if (match) {
         lessonTrail = match;
         break;
@@ -136,10 +126,12 @@ export function SubjectSidebarProvider({
       return {
         breadcrumbItems: [
           ...breadcrumbItems,
-          { title: slugToLabel(lessonSlug), href: pathname },
+          { title: slugToLabel(lessonSlug), href: normalizedPathname },
         ],
-        lessonGroups,
+        lessonGroups: routedLessonGroups,
         status,
+        subjectHref,
+        subjectName,
         subjectSlug,
       };
     }
@@ -152,8 +144,10 @@ export function SubjectSidebarProvider({
           href: node.href,
         })),
       ],
-      lessonGroups,
+      lessonGroups: routedLessonGroups,
       status,
+      subjectHref,
+      subjectName,
       subjectSlug,
     };
   }, [pathname, sidebarTree, subjectName, subjectSlug]);
