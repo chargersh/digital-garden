@@ -386,11 +386,11 @@ export const move = mutation({
       updatedAt,
     });
 
-    if (targetGroupId !== node.groupId) {
+    if (targetGroupId !== sourceGroupId) {
       await reassignSubtreeGroup(
         ctx.db,
         node.subjectId,
-        node.groupId,
+        sourceGroupId,
         targetGroupId,
         node._id,
         updatedAt
