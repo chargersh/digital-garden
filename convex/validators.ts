@@ -12,6 +12,18 @@ export const lessonStatusValidator = v.union(
   v.literal("archived")
 );
 
+export const lessonNodeKindValidator = v.union(
+  v.literal("lesson"),
+  v.literal("collapsible")
+);
+
+export const lessonNodeStatusValidator = v.union(
+  v.literal("draft"),
+  v.literal("published"),
+  v.literal("archived"),
+  v.null()
+);
+
 export const subjectFields = {
   _id: v.id("subjects"),
   uid: v.string(),
@@ -86,3 +98,58 @@ export const lessonGroupWithItemsValidator = v.object({
   _creationTime: v.number(),
   items: v.array(sidebarItemValidator),
 });
+
+export const lessonNodeFields = {
+  _id: v.id("lessonNodes"),
+  uid: v.string(),
+  subjectId: v.id("subjects"),
+  groupId: v.id("lessonGroups"),
+  parentNodeId: v.union(v.id("lessonNodes"), v.null()),
+  kind: lessonNodeKindValidator,
+  title: v.string(),
+  slug: v.string(),
+  order: v.number(),
+  status: lessonNodeStatusValidator,
+  updatedAt: v.number(),
+};
+
+export const lessonNodeValidator = v.object({
+  ...lessonNodeFields,
+  _creationTime: v.number(),
+});
+
+export const lessonNodeMutationResultValidator = v.object(lessonNodeFields);
+
+export const lessonNodeSidebarItemValidator = v.object({
+  id: v.id("lessonNodes"),
+  uid: v.string(),
+  kind: lessonNodeKindValidator,
+  title: v.string(),
+  slug: v.string(),
+  status: lessonNodeStatusValidator,
+  items: v.optional(v.array(v.any())),
+});
+
+export const lessonGroupWithNodeItemsValidator = v.object({
+  ...lessonGroupFields,
+  _creationTime: v.number(),
+  items: v.array(lessonNodeSidebarItemValidator),
+});
+
+export const lessonContentFields = {
+  _id: v.id("lessonContent"),
+  nodeId: v.id("lessonNodes"),
+  description: v.string(),
+  bodyMdx: v.string(),
+  difficulty: difficultyValidator,
+  summary: v.union(v.string(), v.null()),
+  updatedAt: v.number(),
+};
+
+export const lessonContentValidator = v.object({
+  ...lessonContentFields,
+  _creationTime: v.number(),
+});
+
+export const lessonContentMutationResultValidator =
+  v.object(lessonContentFields);
