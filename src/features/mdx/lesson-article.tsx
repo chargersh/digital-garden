@@ -1,31 +1,14 @@
-import { notFound } from "next/navigation";
-import { getConvexLesson } from "@/features/mdx/load-lesson-convex";
 import { getMDXComponents } from "@/features/mdx/mdx-components";
+import type { CompiledLessonContent } from "@/features/mdx/types";
 import { TableOfContents } from "@/features/toc/table-of-contents";
 
 const mdxComponents = getMDXComponents();
 
-interface StudioLessonPageProps {
-  params: Promise<{
-    lesson: string;
-    subject: string;
-  }>;
+interface LessonArticleProps {
+  compiledLesson: CompiledLessonContent;
 }
 
-export default async function StudioLessonPage({
-  params,
-}: StudioLessonPageProps) {
-  const { subject, lesson } = await params;
-  const compiledLesson = await getConvexLesson({
-    includeUnpublished: true,
-    subjectSlug: subject,
-    lessonSlug: lesson,
-  });
-
-  if (!compiledLesson) {
-    notFound();
-  }
-
+export const LessonArticle = ({ compiledLesson }: LessonArticleProps) => {
   const Body = compiledLesson.body;
 
   return (
@@ -46,4 +29,4 @@ export default async function StudioLessonPage({
       </div>
     </div>
   );
-}
+};

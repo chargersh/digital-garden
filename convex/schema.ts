@@ -1,6 +1,6 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
-import { difficultyValidator, lessonStatusValidator } from "./validators";
+import { difficultyValidator } from "./validators";
 
 export default defineSchema({
   subjects: defineTable({
@@ -27,28 +27,47 @@ export default defineSchema({
     .index("by_subjectId_and_slug", ["subjectId", "slug"])
     .index("by_subjectId_and_isDefault", ["subjectId", "isDefault"]),
 
-  lessons: defineTable({
+  lessonNodes: defineTable({
     uid: v.string(),
     subjectId: v.id("subjects"),
     groupId: v.id("lessonGroups"),
-    parentLessonId: v.union(v.id("lessons"), v.null()),
+    parentNodeId: v.union(v.id("lessonNodes"), v.null()),
+    kind: v.union(v.literal("lesson"), v.literal("collapsible")),
     title: v.string(),
-    description: v.string(),
-    lessonSlug: v.string(),
-    bodyMdx: v.string(),
+    slug: v.string(),
     order: v.number(),
-    difficulty: difficultyValidator,
-    status: lessonStatusValidator,
+    status: v.union(
+      v.literal("draft"),
+      v.literal("published"),
+      v.literal("archived"),
+      v.null()
+    ),
     updatedAt: v.number(),
-    summary: v.union(v.string(), v.null()),
   })
     .index("by_subjectId_and_uid", ["subjectId", "uid"])
-    .index("by_subjectId_and_lessonSlug", ["subjectId", "lessonSlug"])
-    .index("by_subjectId_and_groupId_and_parentLessonId_and_order", [
+    .index("by_subjectId_and_groupId_and_parentNodeId_and_order", [
       "subjectId",
       "groupId",
-      "parentLessonId",
+      "parentNodeId",
       "order",
     ])
-    .index("by_subjectId_and_status", ["subjectId", "status"]),
+    .index("by_subjectId_and_parentNodeId_and_slug", [
+      "subjectId",
+      "parentNodeId",
+      "slug",
+    ])
+    .index("by_subjectId_and_groupId_and_kind", [
+      "subjectId",
+      "groupId",
+      "kind",
+    ]),
+
+  lessonContent: defineTable({
+    nodeId: v.id("lessonNodes"),
+    description: v.string(),
+    bodyMdx: v.string(),
+    difficulty: difficultyValidator,
+    summary: v.union(v.string(), v.null()),
+    updatedAt: v.number(),
+  }).index("by_nodeId", ["nodeId"]),
 });

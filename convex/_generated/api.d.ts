@@ -10,10 +10,11 @@
 
 import type * as helpers_common from "../helpers/common.js";
 import type * as helpers_lessonGroups from "../helpers/lessonGroups.js";
-import type * as helpers_lessons from "../helpers/lessons.js";
+import type * as helpers_lessonNodes from "../helpers/lessonNodes.js";
 import type * as helpers_subjects from "../helpers/subjects.js";
+import type * as lessonContent from "../lessonContent.js";
 import type * as lessonGroups from "../lessonGroups.js";
-import type * as lessons from "../lessons.js";
+import type * as lessonNodes from "../lessonNodes.js";
 import type * as subjects from "../subjects.js";
 import type * as validators from "../validators.js";
 
@@ -26,10 +27,11 @@ import type {
 declare const fullApi: ApiFromModules<{
   "helpers/common": typeof helpers_common;
   "helpers/lessonGroups": typeof helpers_lessonGroups;
-  "helpers/lessons": typeof helpers_lessons;
+  "helpers/lessonNodes": typeof helpers_lessonNodes;
   "helpers/subjects": typeof helpers_subjects;
+  lessonContent: typeof lessonContent;
   lessonGroups: typeof lessonGroups;
-  lessons: typeof lessons;
+  lessonNodes: typeof lessonNodes;
   subjects: typeof subjects;
   validators: typeof validators;
 }>;

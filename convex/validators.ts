@@ -6,10 +6,17 @@ export const difficultyValidator = v.union(
   v.literal("advanced")
 );
 
-export const lessonStatusValidator = v.union(
+export const lessonNodeKindValidator = v.union(
+  v.literal("lesson"),
+  v.literal("collapsible")
+);
+
+export const lessonNodeStatusValidator = v.union(
   v.literal("draft"),
   v.literal("published"),
-  v.literal("archived")
+  v.literal("archived"),
+  // null means "no publish status" for collapsible nodes.
+  v.null()
 );
 
 export const subjectFields = {
@@ -45,44 +52,59 @@ export const lessonGroupValidator = v.object({
 
 export const lessonGroupMutationResultValidator = v.object(lessonGroupFields);
 
-export const lessonFields = {
-  _id: v.id("lessons"),
+export const lessonNodeFields = {
+  _id: v.id("lessonNodes"),
   uid: v.string(),
   subjectId: v.id("subjects"),
   groupId: v.id("lessonGroups"),
-  parentLessonId: v.union(v.id("lessons"), v.null()),
+  parentNodeId: v.union(v.id("lessonNodes"), v.null()),
+  kind: lessonNodeKindValidator,
   title: v.string(),
-  description: v.string(),
-  lessonSlug: v.string(),
-  bodyMdx: v.string(),
+  slug: v.string(),
   order: v.number(),
-  difficulty: difficultyValidator,
-  status: lessonStatusValidator,
+  status: lessonNodeStatusValidator,
   updatedAt: v.number(),
-  summary: v.union(v.string(), v.null()),
 };
 
-export const lessonValidator = v.object({
-  ...lessonFields,
+export const lessonNodeValidator = v.object({
+  ...lessonNodeFields,
   _creationTime: v.number(),
 });
 
-export const lessonMutationResultValidator = v.object(lessonFields);
+export const lessonNodeMutationResultValidator = v.object(lessonNodeFields);
 
-export const sidebarItemValidator = v.object({
-  id: v.id("lessons"),
+export const lessonNodeSidebarItemValidator = v.object({
+  id: v.id("lessonNodes"),
   uid: v.string(),
+  kind: lessonNodeKindValidator,
   title: v.string(),
-  lessonSlug: v.string(),
-  href: v.string(),
-  status: lessonStatusValidator,
-  // Convex validators don't support recursive types; nested SidebarNode[]
-  // items are validated structurally in application code instead.
+  slug: v.string(),
+  status: lessonNodeStatusValidator,
+  // Convex validators are non-recursive, so nested sidebar children use v.any().
+  // Top-level shape is validated here; deeper `items` descendants are not runtime-validated.
   items: v.optional(v.array(v.any())),
 });
 
-export const lessonGroupWithItemsValidator = v.object({
+export const lessonGroupWithNodeItemsValidator = v.object({
   ...lessonGroupFields,
   _creationTime: v.number(),
-  items: v.array(sidebarItemValidator),
+  items: v.array(lessonNodeSidebarItemValidator),
 });
+
+export const lessonContentFields = {
+  _id: v.id("lessonContent"),
+  nodeId: v.id("lessonNodes"),
+  description: v.string(),
+  bodyMdx: v.string(),
+  difficulty: difficultyValidator,
+  summary: v.union(v.string(), v.null()),
+  updatedAt: v.number(),
+};
+
+export const lessonContentValidator = v.object({
+  ...lessonContentFields,
+  _creationTime: v.number(),
+});
+
+export const lessonContentMutationResultValidator =
+  v.object(lessonContentFields);

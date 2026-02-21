@@ -5,3 +5,13 @@ export const normalizeRequired = (value: string, fieldName: string): string => {
   }
   return normalized;
 };
+
+export const slugifyValue = (value: string): string => {
+  const normalized = value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  return normalized.length > 0 ? normalized : "untitled";
+};

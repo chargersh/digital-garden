@@ -26,18 +26,43 @@ export const withRoutePrefix = (href: string, routePrefix: string) => {
   return routePrefix ? `${routePrefix}${href}` : href;
 };
 
-export const mapNodeForRoute = (
+const buildNodeHref = (
+  subjectSlug: string,
+  routePrefix: string,
+  pathSegments: string[]
+) => {
+  // Slugs are currently normalized to URL-safe [a-z0-9-], so encoding is a no-op.
+  // If slug rules change, ensure trail matching compares encoded/decoded path formats consistently.
+  const encodedPath = pathSegments.map(encodeURIComponent).join("/");
+  return withRoutePrefix(`/${subjectSlug}/${encodedPath}`, routePrefix);
+};
+
+export const mapSidebarNodeForRoute = (
   node: LessonNode,
-  routePrefix: string
+  subjectSlug: string,
+  routePrefix: string,
+  parentPathSegments: string[] = []
 ): LessonNode => {
+  const pathSegments = [...parentPathSegments, node.slug];
+  const nested = node.items?.map((item) =>
+    mapSidebarNodeForRoute(item, subjectSlug, routePrefix, pathSegments)
+  );
+
+  const href =
+    node.kind === "lesson"
+      ? buildNodeHref(subjectSlug, routePrefix, pathSegments)
+      : undefined;
+
+  const items = nested && nested.length > 0 ? nested : undefined;
+
   return {
     ...node,
-    href: node.href ? withRoutePrefix(node.href, routePrefix) : undefined,
-    items: node.items?.map((item) => mapNodeForRoute(item, routePrefix)),
+    href,
+    items,
   };
 };
 
-export const getLessonSlugFromPathname = (
+export const getLessonPathFromPathname = (
   pathname: string,
   subjectSlug: string,
   routePrefix: string
@@ -47,10 +72,10 @@ export const getLessonSlugFromPathname = (
   const subjectIndex = prefixSegments.length;
 
   if (segments[subjectIndex] !== subjectSlug) {
-    return null;
+    return [];
   }
 
-  return segments[subjectIndex + 1] ?? null;
+  return segments.slice(subjectIndex + 1);
 };
 
 export const findLessonTrail = (
