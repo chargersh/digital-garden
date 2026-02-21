@@ -193,7 +193,8 @@ const byOrder = (a: LessonNodeDoc, b: LessonNodeDoc) =>
 export const buildSidebarTree = async (
   db: DatabaseReader,
   subjectId: Id<"subjects">,
-  includeUnpublished: boolean
+  includeUnpublished: boolean,
+  includeEmptyCollapsibles: boolean
 ): Promise<{
   groups: Array<Doc<"lessonGroups"> & { items: SidebarLessonNode[] }>;
 }> => {
@@ -262,7 +263,10 @@ export const buildSidebarTree = async (
       };
     }
 
-    if (!includeUnpublished && nested.length === 0) {
+    if (
+      !(includeUnpublished || includeEmptyCollapsibles) &&
+      nested.length === 0
+    ) {
       return null;
     }
 
@@ -285,6 +289,32 @@ export const buildSidebarTree = async (
         .filter((item): item is SidebarLessonNode => item !== null),
     })),
   };
+};
+
+export const reindexSiblingOrders = async (
+  db: DatabaseReader & DatabaseWriter,
+  subjectId: Id<"subjects">,
+  groupId: Id<"lessonGroups">,
+  parentNodeId: Id<"lessonNodes"> | null
+) => {
+  const siblings = await db
+    .query("lessonNodes")
+    .withIndex("by_subjectId_and_groupId_and_parentNodeId_and_order", (q) =>
+      q
+        .eq("subjectId", subjectId)
+        .eq("groupId", groupId)
+        .eq("parentNodeId", parentNodeId)
+    )
+    .collect();
+
+  siblings.sort(byOrder);
+
+  for (const [index, sibling] of siblings.entries()) {
+    if (sibling.order === index) {
+      continue;
+    }
+    await db.patch(sibling._id, { order: index });
+  }
 };
 
 export const reassignSubtreeGroup = async (

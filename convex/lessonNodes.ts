@@ -14,6 +14,7 @@ import {
   getLessonNodeOrThrow,
   getNextLessonNodeOrder,
   reassignSubtreeGroup,
+  reindexSiblingOrders,
 } from "./helpers/lessonNodes";
 import {
   difficultyValidator,
@@ -95,15 +96,21 @@ export const getSidebarTreeBySubject = query({
   args: {
     subjectId: v.id("subjects"),
     includeUnpublished: v.optional(v.boolean()),
+    includeEmptyCollapsibles: v.optional(v.boolean()),
   },
   returns: v.object({
     groups: v.array(lessonGroupWithNodeItemsValidator),
   }),
   handler: async (ctx, args) => {
+    const includeUnpublished = args.includeUnpublished ?? false;
+    const includeEmptyCollapsibles =
+      args.includeEmptyCollapsibles ?? includeUnpublished;
+
     return await buildSidebarTree(
       ctx.db,
       args.subjectId,
-      args.includeUnpublished ?? false
+      includeUnpublished,
+      includeEmptyCollapsibles
     );
   },
 });
@@ -266,20 +273,28 @@ export const createGroupChild = mutation({
       updatedAt,
     });
 
+    await reindexSiblingOrders(
+      ctx.db,
+      args.subjectId,
+      args.groupId,
+      parentNodeId
+    );
+    const persistedNode = await getLessonNodeOrThrow(ctx.db, nodeId);
+
     if (args.kind === "collapsible") {
       return {
         node: {
-          _id: nodeId,
-          uid,
-          subjectId: args.subjectId,
-          groupId: args.groupId,
-          parentNodeId,
-          kind: args.kind,
-          title,
-          slug,
-          order,
-          status,
-          updatedAt,
+          _id: persistedNode._id,
+          uid: persistedNode.uid,
+          subjectId: persistedNode.subjectId,
+          groupId: persistedNode.groupId,
+          parentNodeId: persistedNode.parentNodeId,
+          kind: persistedNode.kind,
+          title: persistedNode.title,
+          slug: persistedNode.slug,
+          order: persistedNode.order,
+          status: persistedNode.status,
+          updatedAt: persistedNode.updatedAt,
         },
         content: null,
       };
@@ -306,17 +321,17 @@ export const createGroupChild = mutation({
 
     return {
       node: {
-        _id: nodeId,
-        uid,
-        subjectId: args.subjectId,
-        groupId: args.groupId,
-        parentNodeId,
-        kind: args.kind,
-        title,
-        slug,
-        order,
-        status,
-        updatedAt,
+        _id: persistedNode._id,
+        uid: persistedNode.uid,
+        subjectId: persistedNode.subjectId,
+        groupId: persistedNode.groupId,
+        parentNodeId: persistedNode.parentNodeId,
+        kind: persistedNode.kind,
+        title: persistedNode.title,
+        slug: persistedNode.slug,
+        order: persistedNode.order,
+        status: persistedNode.status,
+        updatedAt: persistedNode.updatedAt,
       },
       content: {
         _id: contentId,
@@ -395,6 +410,8 @@ export const move = mutation({
   returns: lessonNodeMutationResultValidator,
   handler: async (ctx, args) => {
     const node = await getLessonNodeOrThrow(ctx.db, args.nodeId);
+    const sourceGroupId = node.groupId;
+    const sourceParentNodeId = node.parentNodeId;
     const targetGroupId = args.targetGroupId ?? node.groupId;
     const targetParentNodeId =
       args.targetParentNodeId === undefined
@@ -423,11 +440,19 @@ export const move = mutation({
       targetGroupId,
       targetParentNodeId
     );
+    const resolvedSlug = await buildUniqueSiblingSlug(
+      ctx.db,
+      node.subjectId,
+      targetParentNodeId,
+      node.slug,
+      node._id
+    );
     const updatedAt = Date.now();
 
     await ctx.db.patch(node._id, {
       groupId: targetGroupId,
       parentNodeId: targetParentNodeId,
+      slug: resolvedSlug,
       order,
       updatedAt,
     });
@@ -443,18 +468,37 @@ export const move = mutation({
       );
     }
 
+    await reindexSiblingOrders(
+      ctx.db,
+      node.subjectId,
+      sourceGroupId,
+      sourceParentNodeId
+    );
+    if (
+      sourceGroupId !== targetGroupId ||
+      sourceParentNodeId !== targetParentNodeId
+    ) {
+      await reindexSiblingOrders(
+        ctx.db,
+        node.subjectId,
+        targetGroupId,
+        targetParentNodeId
+      );
+    }
+    const movedNode = await getLessonNodeOrThrow(ctx.db, node._id);
+
     return {
-      _id: node._id,
-      uid: node.uid,
-      subjectId: node.subjectId,
-      groupId: targetGroupId,
-      parentNodeId: targetParentNodeId,
-      kind: node.kind,
-      title: node.title,
-      slug: node.slug,
-      order,
-      status: node.status,
-      updatedAt,
+      _id: movedNode._id,
+      uid: movedNode.uid,
+      subjectId: movedNode.subjectId,
+      groupId: movedNode.groupId,
+      parentNodeId: movedNode.parentNodeId,
+      kind: movedNode.kind,
+      title: movedNode.title,
+      slug: movedNode.slug,
+      order: movedNode.order,
+      status: movedNode.status,
+      updatedAt: movedNode.updatedAt,
     };
   },
 });
@@ -550,10 +594,42 @@ export const removeNode = mutation({
         await ctx.db.delete(content._id);
       }
       await ctx.db.delete(node._id);
+      await reindexSiblingOrders(
+        ctx.db,
+        node.subjectId,
+        node.groupId,
+        node.parentNodeId
+      );
       return { deletedNodeIds: [node._id] };
     }
 
     const deletedNodeIds = await deleteSubtree(ctx, node._id);
+    await reindexSiblingOrders(
+      ctx.db,
+      node.subjectId,
+      node.groupId,
+      node.parentNodeId
+    );
+    return { deletedNodeIds };
+  },
+});
+
+export const removeSubtree = mutation({
+  args: {
+    nodeId: v.id("lessonNodes"),
+  },
+  returns: removeNodeResultValidator,
+  handler: async (ctx, args) => {
+    const root = await getLessonNodeOrThrow(ctx.db, args.nodeId);
+    const deletedNodeIds = await deleteSubtree(ctx, args.nodeId);
+
+    await reindexSiblingOrders(
+      ctx.db,
+      root.subjectId,
+      root.groupId,
+      root.parentNodeId
+    );
+
     return { deletedNodeIds };
   },
 });
