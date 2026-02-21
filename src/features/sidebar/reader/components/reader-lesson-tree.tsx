@@ -5,10 +5,10 @@ import { ReaderLessonCollapsible } from "./reader-lesson-collapsible";
 import { ReaderLessonItem } from "./reader-lesson-item";
 
 interface ReaderLessonTreeProps {
-  items: LessonNode[];
-  depth?: number;
   asSubmenu?: boolean;
   className?: string;
+  depth?: number;
+  items: LessonNode[];
 }
 
 export function ReaderLessonTree({

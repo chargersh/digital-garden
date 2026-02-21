@@ -8,10 +8,10 @@ import { cn } from "@/lib/utils";
 import { ReaderLessonTree } from "./reader-lesson-tree";
 
 interface ReaderLessonGroupProps {
-  title: string;
-  items: LessonNode[];
-  id?: string;
   className?: string;
+  id?: string;
+  items: LessonNode[];
+  title: string;
 }
 
 export function ReaderLessonGroup({

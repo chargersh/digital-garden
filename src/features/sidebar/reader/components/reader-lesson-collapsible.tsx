@@ -13,11 +13,11 @@ import {
 import { cn } from "@/lib/utils";
 
 interface ReaderLessonCollapsibleProps {
-  title: string;
   children: ReactNode;
+  className?: string;
   depth?: number;
   id?: string;
-  className?: string;
+  title: string;
 }
 
 export function ReaderLessonCollapsible({

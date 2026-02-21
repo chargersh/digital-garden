@@ -17,8 +17,8 @@ import {
 import type { LessonGroup, LessonNode } from "./types";
 
 interface BreadcrumbItem {
-  title: string;
   href?: string;
+  title: string;
 }
 
 interface SubjectSidebarContextValue {

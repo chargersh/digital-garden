@@ -8,10 +8,10 @@ import { cn } from "@/lib/utils";
 import { StudioLessonTree } from "./studio-lesson-tree";
 
 interface StudioLessonGroupProps {
-  title: string;
-  items: LessonNode[];
-  id?: string;
   className?: string;
+  id?: string;
+  items: LessonNode[];
+  title: string;
 }
 
 export function StudioLessonGroup({

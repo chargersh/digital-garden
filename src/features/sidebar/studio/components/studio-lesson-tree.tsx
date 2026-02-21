@@ -5,10 +5,10 @@ import { StudioLessonCollapsible } from "./studio-lesson-collapsible";
 import { StudioLessonItem } from "./studio-lesson-item";
 
 interface StudioLessonTreeProps {
-  items: LessonNode[];
-  depth?: number;
   asSubmenu?: boolean;
   className?: string;
+  depth?: number;
+  items: LessonNode[];
 }
 
 export function StudioLessonTree({

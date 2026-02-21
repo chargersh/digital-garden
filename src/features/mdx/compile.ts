@@ -7,9 +7,9 @@ import { getMdxPreset } from "@/features/mdx/preset";
 import type { TocItem } from "@/features/toc/types";
 
 interface CompileMdxInput {
+  cacheKey: string;
   filePath: string;
   source: string;
-  cacheKey: string;
 }
 
 interface CompileMdxOutput {

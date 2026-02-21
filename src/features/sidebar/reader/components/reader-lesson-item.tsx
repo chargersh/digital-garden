@@ -12,11 +12,11 @@ import {
 import { cn } from "@/lib/utils";
 
 interface ReaderLessonItemProps {
-  title: string;
+  className?: string;
+  depth?: number;
   href: string;
   id?: string;
-  depth?: number;
-  className?: string;
+  title: string;
 }
 
 export function ReaderLessonItem({

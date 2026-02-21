@@ -5,23 +5,23 @@ export type LessonDifficulty = "beginner" | "intermediate" | "advanced";
 export type LessonStatus = "archived" | "draft" | "published";
 
 export interface LessonFrontmatter {
-  title: string;
   description: string;
-  subject: string;
+  difficulty: LessonDifficulty;
+  estimatedMinutes?: number;
   lessonSlug: string;
   order: number;
-  difficulty: LessonDifficulty;
-  tags: string[];
   status: LessonStatus;
-  updatedAt: string;
-  estimatedMinutes?: number;
+  subject: string;
   summary?: string;
+  tags: string[];
+  title: string;
+  updatedAt: string;
 }
 
 export interface CompiledLessonContent {
   body: MDXContent;
-  toc: TocItem[];
-  frontmatter: LessonFrontmatter;
   canonicalUrl: string;
+  frontmatter: LessonFrontmatter;
   sourcePath: string;
+  toc: TocItem[];
 }

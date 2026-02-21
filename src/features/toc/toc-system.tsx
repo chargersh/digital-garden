@@ -67,9 +67,9 @@ export function useActiveAnchors(): string[] {
 }
 
 interface TocProviderProps {
+  children: ReactNode;
   items: TocItem[];
   single?: boolean;
-  children: ReactNode;
 }
 
 export function TocProvider({

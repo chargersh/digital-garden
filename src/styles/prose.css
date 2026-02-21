@@ -21,15 +21,15 @@
     :where(blockquote):not(
       :where([class~="not-prose"], [class~="not-prose"] *)
     ) {
-    color: var(--tw-prose-quotes);
-    border-inline-start-width: 0.25rem;
-    border-inline-start-color: var(--tw-prose-quote-borders);
-    quotes: "\201C" "\201D" "\2018" "\2019";
+    padding-inline-start: 1em;
     margin-top: 1.6em;
     margin-bottom: 1.6em;
-    padding-inline-start: 1em;
     font-style: italic;
     font-weight: 500;
+    color: var(--tw-prose-quotes);
+    quotes: "\201C" "\201D" "\2018" "\2019";
+    border-inline-start-color: var(--tw-prose-quote-borders);
+    border-inline-start-width: 0.25rem;
   }
 
   .prose.prose-compact
@@ -86,49 +86,48 @@
 
   .prose.prose-compact
     :where(ul):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+    padding-inline-start: 1.625em;
     margin-top: 1.25em;
     margin-bottom: 1.25em;
-    padding-inline-start: 1.625em;
     list-style-type: disc;
   }
 
   .prose.prose-compact input[type="checkbox"] {
+    --tw-duration: 0.2s;
+    position: relative;
+    width: calc(var(--spacing) * 4);
+    height: calc(var(--spacing) * 4);
     margin-top: calc(var(--spacing) * -0.5);
     margin-right: calc(var(--spacing) * 1);
-    height: calc(var(--spacing) * 4);
-    width: calc(var(--spacing) * 4);
-    cursor: pointer;
+    vertical-align: middle;
     appearance: none;
+    cursor: pointer;
+    background-color: var(--background);
+    border-color: var(--border);
     border-style: var(--tw-border-style);
     border-width: 2px;
-    border-color: var(--border);
-    background-color: var(--background);
-    vertical-align: middle;
-    transition-property: all;
+
+    border-radius: 0.25rem;
     transition-timing-function: var(
       --tw-ease,
       var(--default-transition-timing-function)
     );
     transition-duration: var(--tw-duration, var(--default-transition-duration));
-
-    --tw-duration: 0.2s;
-
-    border-radius: 0.25rem;
+    transition-property: all;
     animation-duration: 0.2s;
-    position: relative;
   }
 
   .prose.prose-compact input[type="checkbox"]:checked {
-    border-color: var(--secondary);
-    background-color: var(--secondary);
     color: var(--secondary-foreground);
+    background-color: var(--secondary);
+    border-color: var(--secondary);
   }
 
   .prose.prose-compact
     :where(ol):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+    padding-inline-start: 1.625em;
     margin-top: 1.25em;
     margin-bottom: 1.25em;
-    padding-inline-start: 1.625em;
     list-style-type: decimal;
   }
 
@@ -147,8 +146,8 @@
 
   .prose.prose-compact
     :where(strong):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
-    color: var(--tw-prose-bold);
     font-weight: 600;
+    color: var(--tw-prose-bold);
   }
 
   .prose.prose-compact
@@ -169,10 +168,10 @@
 
   .prose.prose-compact
     :where(hr):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
-    border-color: var(--tw-prose-hr);
-    border-top-width: 1px;
     margin-top: 3em;
     margin-bottom: 3em;
+    border-color: var(--tw-prose-hr);
+    border-top-width: 1px;
   }
 
   .prose.prose-compact

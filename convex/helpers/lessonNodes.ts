@@ -7,12 +7,12 @@ type LessonNodeResult = Omit<LessonNodeDoc, "_creationTime">;
 
 export interface SidebarLessonNode {
   id: Id<"lessonNodes">;
-  uid: string;
+  items?: SidebarLessonNode[];
   kind: LessonNodeDoc["kind"];
-  title: string;
   slug: string;
   status: LessonNodeDoc["status"];
-  items?: SidebarLessonNode[];
+  title: string;
+  uid: string;
 }
 
 export const buildDefaultLessonDescription = (title: string): string =>

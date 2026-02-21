@@ -2,20 +2,20 @@ export type LessonNodeKind = "lesson" | "collapsible";
 export type LessonNodeStatus = "archived" | "draft" | "published" | null;
 
 export interface LessonNode {
+  href?: string;
   id: string;
-  uid: string;
+  items?: LessonNode[];
   kind: LessonNodeKind;
-  title: string;
   slug: string;
   status: LessonNodeStatus;
-  href?: string;
-  items?: LessonNode[];
+  title: string;
+  uid: string;
 }
 
 export interface LessonGroup {
-  title: string;
+  className?: string;
+  id?: string;
   items: LessonNode[];
   order: number;
-  id?: string;
-  className?: string;
+  title: string;
 }

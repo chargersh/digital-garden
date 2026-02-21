@@ -42,9 +42,9 @@ const flattenNodeText = (value: unknown): string => {
 };
 
 export interface RemarkHeadingOptions {
-  slug?: (root: Root, heading: Heading, text: string) => string;
   customId?: boolean;
   generateToc?: boolean;
+  slug?: (root: Root, heading: Heading, text: string) => string;
 }
 
 export const remarkHeading = ({
