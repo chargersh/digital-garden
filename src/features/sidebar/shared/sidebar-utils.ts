@@ -31,6 +31,8 @@ const buildNodeHref = (
   routePrefix: string,
   pathSegments: string[]
 ) => {
+  // Slugs are currently normalized to URL-safe [a-z0-9-], so encoding is a no-op.
+  // If slug rules change, ensure trail matching compares encoded/decoded path formats consistently.
   const encodedPath = pathSegments.map(encodeURIComponent).join("/");
   return withRoutePrefix(`/${subjectSlug}/${encodedPath}`, routePrefix);
 };

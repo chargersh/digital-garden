@@ -3,6 +3,7 @@ import type { DatabaseReader, DatabaseWriter } from "../_generated/server";
 import { slugifyValue } from "./common";
 
 type LessonNodeDoc = Doc<"lessonNodes">;
+type LessonNodeResult = Omit<LessonNodeDoc, "_creationTime">;
 
 export interface SidebarLessonNode {
   id: Id<"lessonNodes">;
@@ -13,6 +14,48 @@ export interface SidebarLessonNode {
   status: LessonNodeDoc["status"];
   items?: SidebarLessonNode[];
 }
+
+export const buildDefaultLessonDescription = (title: string): string =>
+  `Notes for ${title}.`;
+
+export const buildDefaultLessonBody = (title: string): string =>
+  `# ${title}\n\nStart writing here.`;
+
+export const toNodeResult = (
+  node: LessonNodeDoc,
+  overrides?: Partial<LessonNodeResult>
+): LessonNodeResult => ({
+  _id: node._id,
+  uid: node.uid,
+  subjectId: node.subjectId,
+  groupId: node.groupId,
+  parentNodeId: node.parentNodeId,
+  kind: node.kind,
+  title: node.title,
+  slug: node.slug,
+  order: node.order,
+  status: node.status,
+  updatedAt: node.updatedAt,
+  ...overrides,
+});
+
+export const resolveNodeStatus = (
+  kind: LessonNodeDoc["kind"],
+  requestedStatus: LessonNodeDoc["status"] | undefined
+): LessonNodeDoc["status"] => {
+  if (kind === "collapsible") {
+    if (requestedStatus !== undefined && requestedStatus !== null) {
+      throw new Error('Collapsible nodes must have status "null".');
+    }
+    return null;
+  }
+
+  if (requestedStatus === null) {
+    throw new Error("Lesson nodes must have a non-null status.");
+  }
+
+  return requestedStatus ?? "draft";
+};
 
 export const getLessonNodeOrThrow = async (
   db: DatabaseReader,
@@ -87,8 +130,15 @@ export const buildUniqueSiblingSlug = async (
 ) => {
   const baseSlug = slugifyValue(titleOrSlug);
   let attempt = 0;
+  const MAX_SLUG_ATTEMPTS = 100;
 
   while (true) {
+    if (attempt >= MAX_SLUG_ATTEMPTS) {
+      throw new Error(
+        `Could not generate a unique slug for "${baseSlug}" after ${MAX_SLUG_ATTEMPTS} attempts.`
+      );
+    }
+
     const suffix = attempt === 0 ? "" : `-${attempt + 1}`;
     const candidate = `${baseSlug}${suffix}`;
     const existing = await db
@@ -389,4 +439,36 @@ export const collectSubtreeNodes = async (
   }
 
   return result;
+};
+
+export const deleteSubtree = async (
+  db: DatabaseReader & DatabaseWriter,
+  rootNodeId: Id<"lessonNodes">
+): Promise<Id<"lessonNodes">[]> => {
+  const root = await getLessonNodeOrThrow(db, rootNodeId);
+  const subtree = await collectSubtreeNodes(
+    db,
+    root.subjectId,
+    root.groupId,
+    rootNodeId
+  );
+
+  for (const node of subtree) {
+    if (node.kind !== "lesson") {
+      continue;
+    }
+    const content = await db
+      .query("lessonContent")
+      .withIndex("by_nodeId", (q) => q.eq("nodeId", node._id))
+      .unique();
+    if (content) {
+      await db.delete(content._id);
+    }
+  }
+
+  for (let index = subtree.length - 1; index >= 0; index -= 1) {
+    await db.delete(subtree[index]._id);
+  }
+
+  return subtree.map((node) => node._id);
 };

@@ -1,20 +1,23 @@
 import { v } from "convex/values";
 import type { Doc } from "./_generated/dataModel";
-import type { MutationCtx } from "./_generated/server";
 import { mutation, query } from "./_generated/server";
 import { normalizeRequired, slugifyValue } from "./helpers/common";
 import {
   assertNoNodeCycle,
   assertParentNodeForChild,
   assertUniqueLessonNodeUid,
+  buildDefaultLessonBody,
+  buildDefaultLessonDescription,
   buildSidebarTree,
   buildUniqueSiblingSlug,
-  collectSubtreeNodes,
+  deleteSubtree,
   getLessonGroupOrThrow,
   getLessonNodeOrThrow,
   getNextLessonNodeOrder,
   reassignSubtreeGroup,
   reindexSiblingOrders,
+  resolveNodeStatus,
+  toNodeResult,
 } from "./helpers/lessonNodes";
 import {
   difficultyValidator,
@@ -28,11 +31,6 @@ import {
   subjectValidator,
 } from "./validators";
 
-const buildDefaultLessonDescription = (title: string) => `Notes for ${title}.`;
-
-const buildDefaultLessonBody = (title: string) =>
-  `# ${title}\n\nStart writing here.`;
-
 const createGroupChildResultValidator = v.object({
   node: lessonNodeMutationResultValidator,
   content: v.union(lessonContentMutationResultValidator, v.null()),
@@ -41,56 +39,6 @@ const createGroupChildResultValidator = v.object({
 const removeNodeResultValidator = v.object({
   deletedNodeIds: v.array(v.id("lessonNodes")),
 });
-
-const resolveNodeStatus = (
-  kind: "lesson" | "collapsible",
-  requestedStatus: "draft" | "published" | "archived" | null | undefined
-) => {
-  if (kind === "collapsible") {
-    if (requestedStatus !== undefined && requestedStatus !== null) {
-      throw new Error('Collapsible nodes must have status "null".');
-    }
-    return null;
-  }
-
-  if (requestedStatus === null) {
-    throw new Error("Lesson nodes must have a non-null status.");
-  }
-
-  return requestedStatus ?? "draft";
-};
-
-const deleteSubtree = async (
-  ctx: MutationCtx,
-  rootNodeId: Parameters<typeof getLessonNodeOrThrow>[1]
-) => {
-  const root = await getLessonNodeOrThrow(ctx.db, rootNodeId);
-  const subtree = await collectSubtreeNodes(
-    ctx.db,
-    root.subjectId,
-    root.groupId,
-    rootNodeId
-  );
-
-  for (const node of subtree) {
-    if (node.kind !== "lesson") {
-      continue;
-    }
-    const content = await ctx.db
-      .query("lessonContent")
-      .withIndex("by_nodeId", (q) => q.eq("nodeId", node._id))
-      .unique();
-    if (content) {
-      await ctx.db.delete(content._id);
-    }
-  }
-
-  for (let index = subtree.length - 1; index >= 0; index -= 1) {
-    await ctx.db.delete(subtree[index]._id);
-  }
-
-  return subtree.map((node) => node._id);
-};
 
 export const getSidebarTreeBySubject = query({
   args: {
@@ -283,19 +231,7 @@ export const createGroupChild = mutation({
 
     if (args.kind === "collapsible") {
       return {
-        node: {
-          _id: persistedNode._id,
-          uid: persistedNode.uid,
-          subjectId: persistedNode.subjectId,
-          groupId: persistedNode.groupId,
-          parentNodeId: persistedNode.parentNodeId,
-          kind: persistedNode.kind,
-          title: persistedNode.title,
-          slug: persistedNode.slug,
-          order: persistedNode.order,
-          status: persistedNode.status,
-          updatedAt: persistedNode.updatedAt,
-        },
+        node: toNodeResult(persistedNode),
         content: null,
       };
     }
@@ -310,6 +246,16 @@ export const createGroupChild = mutation({
         : buildDefaultLessonBody(title);
     const summary = args.summary?.trim() ?? null;
 
+    const existingContent = await ctx.db
+      .query("lessonContent")
+      .withIndex("by_nodeId", (q) => q.eq("nodeId", nodeId))
+      .unique();
+    if (existingContent) {
+      throw new Error(
+        `Invariant violation: lesson content for node "${nodeId}" already exists.`
+      );
+    }
+
     const contentId = await ctx.db.insert("lessonContent", {
       nodeId,
       description,
@@ -320,19 +266,7 @@ export const createGroupChild = mutation({
     });
 
     return {
-      node: {
-        _id: persistedNode._id,
-        uid: persistedNode.uid,
-        subjectId: persistedNode.subjectId,
-        groupId: persistedNode.groupId,
-        parentNodeId: persistedNode.parentNodeId,
-        kind: persistedNode.kind,
-        title: persistedNode.title,
-        slug: persistedNode.slug,
-        order: persistedNode.order,
-        status: persistedNode.status,
-        updatedAt: persistedNode.updatedAt,
-      },
+      node: toNodeResult(persistedNode),
       content: {
         _id: contentId,
         nodeId,
@@ -385,19 +319,12 @@ export const updateNode = mutation({
 
     await ctx.db.patch(node._id, patch);
 
-    return {
-      _id: node._id,
-      uid: node.uid,
-      subjectId: node.subjectId,
-      groupId: node.groupId,
-      parentNodeId: node.parentNodeId,
-      kind: node.kind,
+    return toNodeResult(node, {
       title: patch.title ?? node.title,
       slug: patch.slug ?? node.slug,
-      order: node.order,
       status: patch.status ?? node.status,
       updatedAt,
-    };
+    });
   },
 });
 
@@ -487,19 +414,7 @@ export const move = mutation({
     }
     const movedNode = await getLessonNodeOrThrow(ctx.db, node._id);
 
-    return {
-      _id: movedNode._id,
-      uid: movedNode.uid,
-      subjectId: movedNode.subjectId,
-      groupId: movedNode.groupId,
-      parentNodeId: movedNode.parentNodeId,
-      kind: movedNode.kind,
-      title: movedNode.title,
-      slug: movedNode.slug,
-      order: movedNode.order,
-      status: movedNode.status,
-      updatedAt: movedNode.updatedAt,
-    };
+    return toNodeResult(movedNode);
   },
 });
 
@@ -603,7 +518,7 @@ export const removeNode = mutation({
       return { deletedNodeIds: [node._id] };
     }
 
-    const deletedNodeIds = await deleteSubtree(ctx, node._id);
+    const deletedNodeIds = await deleteSubtree(ctx.db, node._id);
     await reindexSiblingOrders(
       ctx.db,
       node.subjectId,
@@ -621,7 +536,7 @@ export const removeSubtree = mutation({
   returns: removeNodeResultValidator,
   handler: async (ctx, args) => {
     const root = await getLessonNodeOrThrow(ctx.db, args.nodeId);
-    const deletedNodeIds = await deleteSubtree(ctx, args.nodeId);
+    const deletedNodeIds = await deleteSubtree(ctx.db, args.nodeId);
 
     await reindexSiblingOrders(
       ctx.db,

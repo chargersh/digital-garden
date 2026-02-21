@@ -26,9 +26,8 @@ export function StudioLessonTree({
     <Container className={containerClassName}>
       {items.map((item) => {
         const key = item.id ?? item.href ?? item.title;
-        const hasChildren = Boolean(item.items?.length);
 
-        if (hasChildren && item.items) {
+        if (item.kind === "collapsible") {
           return (
             <StudioLessonCollapsible
               depth={depth}
@@ -39,7 +38,7 @@ export function StudioLessonTree({
               <StudioLessonTree
                 asSubmenu
                 depth={depth + 1}
-                items={item.items}
+                items={item.items ?? []}
               />
             </StudioLessonCollapsible>
           );

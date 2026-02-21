@@ -15,6 +15,7 @@ export const lessonNodeStatusValidator = v.union(
   v.literal("draft"),
   v.literal("published"),
   v.literal("archived"),
+  // null means "no publish status" for collapsible nodes.
   v.null()
 );
 
@@ -79,6 +80,8 @@ export const lessonNodeSidebarItemValidator = v.object({
   title: v.string(),
   slug: v.string(),
   status: lessonNodeStatusValidator,
+  // Convex validators are non-recursive, so nested sidebar children use v.any().
+  // Top-level shape is validated here; deeper `items` descendants are not runtime-validated.
   items: v.optional(v.array(v.any())),
 });
 

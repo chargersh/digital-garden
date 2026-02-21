@@ -72,7 +72,8 @@ export const update = mutation({
     }
 
     if (args.summary !== undefined) {
-      patch.summary = args.summary?.trim() ?? null;
+      const trimmed = args.summary?.trim();
+      patch.summary = trimmed?.length ? trimmed : null;
     }
 
     await ctx.db.patch(content._id, patch);

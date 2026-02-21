@@ -6,7 +6,7 @@ export const normalizeRequired = (value: string, fieldName: string): string => {
   return normalized;
 };
 
-export const slugifyValue = (value: string) => {
+export const slugifyValue = (value: string): string => {
   const normalized = value
     .trim()
     .toLowerCase()
