@@ -8,9 +8,9 @@ import { createContext, useContext, useMemo } from "react";
 import {
   buildSubjectHref,
   findLessonTrail,
-  getLessonSlugFromPathname,
+  getLessonPathFromPathname,
   getRoutePrefixFromPathname,
-  mapNodeForRoute,
+  mapSidebarNodeForRoute,
   normalizePathname,
   slugToLabel,
 } from "./sidebar-utils";
@@ -49,7 +49,7 @@ export function SubjectSidebarProvider({
   subjectName,
   subjectSlug,
 }: SubjectSidebarProviderProps) {
-  const sidebarTree = useQuery(api.lessons.getSidebarTreeById, {
+  const sidebarTree = useQuery(api.lessonNodes.getSidebarTreeBySubject, {
     includeUnpublished,
     subjectId,
   });
@@ -59,27 +59,25 @@ export function SubjectSidebarProvider({
     const status: "loading" | "ready" =
       sidebarTree === undefined ? "loading" : "ready";
 
-    const lessonGroups: LessonGroup[] = sidebarTree
-      ? sidebarTree.groups.map((group) => ({
-          title: group.title,
-          order: group.order,
-          id: `group-${group.uid}`,
-          items: group.items,
-        }))
-      : [];
-
     const normalizedPathname = normalizePathname(pathname);
     const routePrefix = getRoutePrefixFromPathname(normalizedPathname);
-    const lessonSlug = getLessonSlugFromPathname(
+    const lessonPathParts = getLessonPathFromPathname(
       normalizedPathname,
       subjectSlug,
       routePrefix
     );
     const subjectHref = buildSubjectHref(subjectSlug, routePrefix);
-    const routedLessonGroups = lessonGroups.map((group) => ({
-      ...group,
-      items: group.items.map((item) => mapNodeForRoute(item, routePrefix)),
-    }));
+
+    const lessonGroups: LessonGroup[] = sidebarTree
+      ? sidebarTree.groups.map((group) => ({
+          title: group.title,
+          order: group.order,
+          id: `group-${group.uid}`,
+          items: group.items.map((item) =>
+            mapSidebarNodeForRoute(item, subjectSlug, routePrefix)
+          ),
+        }))
+      : [];
 
     const breadcrumbItems: BreadcrumbItem[] = [
       {
@@ -88,10 +86,10 @@ export function SubjectSidebarProvider({
       },
     ];
 
-    if (!lessonSlug) {
+    if (lessonPathParts.length === 0) {
       return {
         breadcrumbItems,
-        lessonGroups: routedLessonGroups,
+        lessonGroups,
         status,
         subjectHref,
         subjectName,
@@ -100,12 +98,14 @@ export function SubjectSidebarProvider({
     }
 
     if (!sidebarTree) {
+      const fallbackSegment = lessonPathParts.at(-1) ?? "";
+
       return {
         breadcrumbItems: [
           ...breadcrumbItems,
-          { title: slugToLabel(lessonSlug), href: normalizedPathname },
+          { title: slugToLabel(fallbackSegment), href: normalizedPathname },
         ],
-        lessonGroups: routedLessonGroups,
+        lessonGroups,
         status,
         subjectHref,
         subjectName,
@@ -114,7 +114,7 @@ export function SubjectSidebarProvider({
     }
 
     let lessonTrail: LessonNode[] = [];
-    for (const group of routedLessonGroups) {
+    for (const group of lessonGroups) {
       const match = findLessonTrail(group.items, normalizedPathname);
       if (match) {
         lessonTrail = match;
@@ -123,12 +123,14 @@ export function SubjectSidebarProvider({
     }
 
     if (lessonTrail.length === 0) {
+      const fallbackSegment = lessonPathParts.at(-1) ?? "";
+
       return {
         breadcrumbItems: [
           ...breadcrumbItems,
-          { title: slugToLabel(lessonSlug), href: normalizedPathname },
+          { title: slugToLabel(fallbackSegment), href: normalizedPathname },
         ],
-        lessonGroups: routedLessonGroups,
+        lessonGroups,
         status,
         subjectHref,
         subjectName,
@@ -144,7 +146,7 @@ export function SubjectSidebarProvider({
           href: node.href,
         })),
       ],
-      lessonGroups: routedLessonGroups,
+      lessonGroups,
       status,
       subjectHref,
       subjectName,

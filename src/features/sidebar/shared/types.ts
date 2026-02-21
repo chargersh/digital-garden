@@ -1,8 +1,15 @@
+export type LessonNodeKind = "lesson" | "collapsible";
+export type LessonNodeStatus = "archived" | "draft" | "published" | null;
+
 export interface LessonNode {
+  id: string;
+  uid: string;
+  kind: LessonNodeKind;
   title: string;
+  slug: string;
+  status: LessonNodeStatus;
   href?: string;
   items?: LessonNode[];
-  id?: string;
 }
 
 export interface LessonGroup {

@@ -5,18 +5,21 @@ import { TableOfContents } from "@/features/toc/table-of-contents";
 
 const mdxComponents = getMDXComponents();
 
-interface LessonPageProps {
+interface StudioLessonPageProps {
   params: Promise<{
-    lesson: string;
+    lessonPath: string[];
     subject: string;
   }>;
 }
 
-export default async function LessonPage({ params }: LessonPageProps) {
-  const { subject, lesson } = await params;
+export default async function StudioLessonPage({
+  params,
+}: StudioLessonPageProps) {
+  const { lessonPath, subject } = await params;
   const compiledLesson = await getConvexLesson({
+    includeUnpublished: true,
+    lessonPathParts: lessonPath,
     subjectSlug: subject,
-    lessonSlug: lesson,
   });
 
   if (!compiledLesson) {

@@ -2,16 +2,16 @@ import "server-only";
 import { api } from "@convex/_generated/api";
 import { fetchQuery } from "convex/nextjs";
 
-export const getLessonByRoute = async (
+export const getLessonByPath = async (
   subjectSlug: string,
-  lessonSlug: string,
+  pathParts: string[],
   options?: {
     includeUnpublished?: boolean;
   }
 ) => {
-  return await fetchQuery(api.lessons.getByRoute, {
+  return await fetchQuery(api.lessonNodes.getLessonByPath, {
     subjectSlug,
-    lessonSlug,
+    pathParts,
     includeUnpublished: options?.includeUnpublished ?? false,
   });
 };
