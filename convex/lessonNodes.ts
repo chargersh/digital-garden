@@ -244,7 +244,8 @@ export const createGroupChild = mutation({
       args.bodyMdx !== undefined
         ? normalizeRequired(args.bodyMdx, "bodyMdx")
         : buildDefaultLessonBody(title);
-    const summary = args.summary?.trim() ?? null;
+    const trimmedSummary = args.summary?.trim();
+    const summary = trimmedSummary?.length ? trimmedSummary : null;
 
     const existingContent = await ctx.db
       .query("lessonContent")
@@ -465,6 +466,8 @@ export const reorder = mutation({
       order += 1;
     }
 
+    // Partial reorder contract: siblings not listed in orderedNodeIds keep their
+    // relative order and are appended after the explicitly ordered nodes.
     for (const node of siblings) {
       if (touched.has(node._id)) {
         continue;

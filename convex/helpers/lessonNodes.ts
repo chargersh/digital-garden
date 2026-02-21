@@ -462,6 +462,8 @@ export const deleteSubtree = async (
       .withIndex("by_nodeId", (q) => q.eq("nodeId", node._id))
       .unique();
     if (content) {
+      // Keep deletes explicit and transactional per document in this mutation.
+      // If subtree sizes grow large, consider chunked/background cleanup.
       await db.delete(content._id);
     }
   }
