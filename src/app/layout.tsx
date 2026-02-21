@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "../styles/globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
 import { ConvexClientProvider } from "@/features/convex/convex-client-provider";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -43,6 +44,7 @@ export default function RootLayout({
           enableSystem
         >
           <ConvexClientProvider>{children}</ConvexClientProvider>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

@@ -5,6 +5,7 @@ import { normalizeRequired } from "./helpers/common";
 import {
   assertUniqueLessonGroupSlug,
   assertUniqueLessonGroupUid,
+  buildUniqueLessonGroupSlug,
   ensureDefaultLessonGroupForSubject,
   getNextLessonGroupOrder,
   setDefaultLessonGroup,
@@ -40,25 +41,26 @@ export const listBySubject = query({
 
 export const create = mutation({
   args: {
-    uid: v.string(),
     subjectId: v.id("subjects"),
     title: v.string(),
-    slug: v.string(),
     isDefault: v.optional(v.boolean()),
   },
   returns: lessonGroupMutationResultValidator,
   handler: async (ctx, args) => {
-    const uid = normalizeRequired(args.uid, "uid");
     const title = normalizeRequired(args.title, "title");
-    const slug = normalizeRequired(args.slug, "slug");
 
     const subject = await ctx.db.get(args.subjectId);
     if (!subject) {
       throw new Error(`Subject "${args.subjectId}" was not found.`);
     }
 
+    const uid = crypto.randomUUID();
     await assertUniqueLessonGroupUid(ctx.db, args.subjectId, uid);
-    await assertUniqueLessonGroupSlug(ctx.db, args.subjectId, slug);
+    const slug = await buildUniqueLessonGroupSlug(
+      ctx.db,
+      args.subjectId,
+      title
+    );
 
     const order = await getNextLessonGroupOrder(ctx.db, args.subjectId);
 

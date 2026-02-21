@@ -13,13 +13,20 @@ import { StudioLessonItem } from "./components/studio-lesson-item";
 import { StudioSidebarHeader } from "./components/studio-sidebar-header";
 
 export function StudioSidebar(props: ComponentProps<typeof Sidebar>) {
-  const { lessonGroups, status, subjectHref, subjectName, subjectSlug } =
-    useSubjectSidebar();
+  const {
+    lessonGroups,
+    status,
+    subjectHref,
+    subjectId,
+    subjectName,
+    subjectSlug,
+  } = useSubjectSidebar();
 
   return (
     <Sidebar {...props}>
       <SidebarHeader className="px-4">
         <StudioSidebarHeader
+          subjectId={subjectId}
           subjectName={subjectName}
           subjectSlug={subjectSlug}
         />
