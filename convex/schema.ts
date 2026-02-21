@@ -1,6 +1,6 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
-import { difficultyValidator, lessonStatusValidator } from "./validators";
+import { difficultyValidator } from "./validators";
 
 export default defineSchema({
   subjects: defineTable({
@@ -26,31 +26,6 @@ export default defineSchema({
     .index("by_subjectId_and_order", ["subjectId", "order"])
     .index("by_subjectId_and_slug", ["subjectId", "slug"])
     .index("by_subjectId_and_isDefault", ["subjectId", "isDefault"]),
-
-  lessons: defineTable({
-    uid: v.string(),
-    subjectId: v.id("subjects"),
-    groupId: v.id("lessonGroups"),
-    parentLessonId: v.union(v.id("lessons"), v.null()),
-    title: v.string(),
-    description: v.string(),
-    lessonSlug: v.string(),
-    bodyMdx: v.string(),
-    order: v.number(),
-    difficulty: difficultyValidator,
-    status: lessonStatusValidator,
-    updatedAt: v.number(),
-    summary: v.union(v.string(), v.null()),
-  })
-    .index("by_subjectId_and_uid", ["subjectId", "uid"])
-    .index("by_subjectId_and_lessonSlug", ["subjectId", "lessonSlug"])
-    .index("by_subjectId_and_groupId_and_parentLessonId_and_order", [
-      "subjectId",
-      "groupId",
-      "parentLessonId",
-      "order",
-    ])
-    .index("by_subjectId_and_status", ["subjectId", "status"]),
 
   lessonNodes: defineTable({
     uid: v.string(),
