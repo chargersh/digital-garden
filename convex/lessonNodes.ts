@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 import type { Doc } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
-import { normalizeRequired, slugifyValue } from "./helpers/common";
+import { normalizeRequired } from "./helpers/common";
 import {
   assertNoNodeCycle,
   assertParentNodeForChild,
@@ -196,7 +196,7 @@ export const createGroupChild = mutation({
       ctx.db,
       args.subjectId,
       parentNodeId,
-      slugifyValue(slugSource)
+      slugSource
     );
 
     const status = resolveNodeStatus(args.kind, args.status);

@@ -45,7 +45,7 @@ export const resolveNodeStatus = (
 ): LessonNodeDoc["status"] => {
   if (kind === "collapsible") {
     if (requestedStatus !== undefined && requestedStatus !== null) {
-      throw new Error('Collapsible nodes must have status "null".');
+      throw new Error("Collapsible nodes must have status null.");
     }
     return null;
   }
@@ -248,6 +248,8 @@ export const buildSidebarTree = async (
 ): Promise<{
   groups: Array<Doc<"lessonGroups"> & { items: SidebarLessonNode[] }>;
 }> => {
+  // This loads all nodes for the subject to build a fully ordered in-memory tree.
+  // If subjects grow very large, consider pagination/lazy loading by group.
   const [groups, nodes] = await Promise.all([
     db
       .query("lessonGroups")
@@ -375,6 +377,7 @@ export const reassignSubtreeGroup = async (
   rootNodeId: Id<"lessonNodes">,
   updatedAt: number
 ) => {
+  // Caller patches the root first; this helper updates descendants only.
   const queue: Id<"lessonNodes">[] = [rootNodeId];
   const descendantIds: Id<"lessonNodes">[] = [];
   let queueIndex = 0;
