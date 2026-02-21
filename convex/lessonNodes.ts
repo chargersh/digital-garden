@@ -257,11 +257,12 @@ export const createGroupChild = mutation({
       );
     }
 
+    const difficulty = args.difficulty ?? "beginner";
     const contentId = await ctx.db.insert("lessonContent", {
       nodeId,
       description,
       bodyMdx,
-      difficulty: args.difficulty ?? "beginner",
+      difficulty,
       summary,
       updatedAt,
     });
@@ -273,7 +274,7 @@ export const createGroupChild = mutation({
         nodeId,
         description,
         bodyMdx,
-        difficulty: args.difficulty ?? "beginner",
+        difficulty,
         summary,
         updatedAt,
       },
@@ -323,7 +324,7 @@ export const updateNode = mutation({
     return toNodeResult(node, {
       title: patch.title ?? node.title,
       slug: patch.slug ?? node.slug,
-      status: patch.status ?? node.status,
+      status: patch.status !== undefined ? patch.status : node.status,
       updatedAt,
     });
   },

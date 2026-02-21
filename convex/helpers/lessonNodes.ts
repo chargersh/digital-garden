@@ -97,30 +97,6 @@ export const assertUniqueLessonNodeUid = async (
   }
 };
 
-export const assertUniqueSiblingSlug = async (
-  db: DatabaseReader,
-  subjectId: Id<"subjects">,
-  parentNodeId: Id<"lessonNodes"> | null,
-  slug: string,
-  excludeId?: Id<"lessonNodes">
-) => {
-  const existing = await db
-    .query("lessonNodes")
-    .withIndex("by_subjectId_and_parentNodeId_and_slug", (q) =>
-      q
-        .eq("subjectId", subjectId)
-        .eq("parentNodeId", parentNodeId)
-        .eq("slug", slug)
-    )
-    .unique();
-
-  if (existing && existing._id !== excludeId) {
-    throw new Error(
-      `Sibling slug "${slug}" is already in use for this parent node.`
-    );
-  }
-};
-
 export const buildUniqueSiblingSlug = async (
   db: DatabaseReader,
   subjectId: Id<"subjects">,
