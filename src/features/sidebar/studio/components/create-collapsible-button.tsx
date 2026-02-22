@@ -1,13 +1,6 @@
-"use client";
-
-import { api } from "@convex/_generated/api";
 import type { Id } from "@convex/_generated/dataModel";
-import { useMutation } from "convex/react";
 import { FolderPlusIcon } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Spinner } from "@/components/ui/spinner";
+import { CreateLessonNodeDialog } from "./create-lesson-node-dialog";
 
 interface CreateCollapsibleButtonProps {
   ariaLabel: string;
@@ -22,45 +15,19 @@ export function CreateCollapsibleButton({
   parentNodeId = null,
   subjectId,
 }: CreateCollapsibleButtonProps) {
-  const createNode = useMutation(api.lessonNodes.createGroupChild);
-  const [isCreating, setIsCreating] = useState(false);
-
-  const handleCreate = async () => {
-    if (isCreating) {
-      return;
-    }
-
-    setIsCreating(true);
-    try {
-      await createNode({
-        groupId,
-        kind: "collapsible",
-        parentNodeId,
-        subjectId,
-        title: "New Collapsible",
-        uid: crypto.randomUUID(),
-      });
-    } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Could not create collapsible.";
-      toast.error(message);
-    } finally {
-      setIsCreating(false);
-    }
-  };
-
   return (
-    <Button
-      aria-label={ariaLabel}
-      disabled={isCreating}
-      onClick={handleCreate}
-      size="icon-xs"
-      type="button"
-      variant="ghost"
-    >
-      {isCreating ? <Spinner /> : <FolderPlusIcon aria-hidden="true" />}
-    </Button>
+    <CreateLessonNodeDialog
+      ariaLabel={ariaLabel}
+      description="Add a section that can contain nested lessons and subsections."
+      errorMessage="Could not create collapsible."
+      groupId={groupId}
+      kind="collapsible"
+      parentNodeId={parentNodeId}
+      placeholder="Section name"
+      subjectId={subjectId}
+      submitLabel="Create"
+      title="New Section"
+      triggerIcon={<FolderPlusIcon aria-hidden="true" />}
+    />
   );
 }

@@ -5,7 +5,7 @@ export type LessonNodeStatus = "archived" | "draft" | "published" | null;
 
 export interface LessonNode {
   href?: string;
-  id: string;
+  id: Id<"lessonNodes">;
   items?: LessonNode[];
   kind: LessonNodeKind;
   slug: string;

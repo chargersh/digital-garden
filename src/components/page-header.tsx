@@ -35,7 +35,7 @@ export function PageHeader() {
               {breadcrumbItems.map((item, index) => {
                 const isLast = index === breadcrumbItems.length - 1;
                 return (
-                  <Fragment key={`${item.href ?? ""}-${item.title}`}>
+                  <Fragment key={`${index}-${item.href ?? ""}-${item.title}`}>
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
                       {isLast || !item.href ? (
