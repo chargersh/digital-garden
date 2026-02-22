@@ -59,6 +59,7 @@ export function StudioSidebar(props: ComponentProps<typeof Sidebar>) {
               id={group.id}
               items={group.items}
               key={group.groupId}
+              subjectId={subjectId}
               title={group.title}
             />
           ))}
