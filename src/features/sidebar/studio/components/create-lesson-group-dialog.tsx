@@ -18,6 +18,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 
 interface CreateLessonGroupDialogProps {
   subjectId: Id<"subjects">;
@@ -85,7 +86,7 @@ export function CreateLessonGroupDialog({
         New Lesson Group
       </DialogTrigger>
 
-      <DialogContent>
+      <DialogContent finalFocus={false}>
         <DialogHeader className="pb-2">
           <DialogTitle>Create Lesson Group</DialogTitle>
           <DialogDescription>
@@ -109,7 +110,7 @@ export function CreateLessonGroupDialog({
           />
         </DialogPanel>
 
-        <DialogFooter className="pt-0" variant="bare">
+        <DialogFooter className="pt-0 sm:justify-between" variant="bare">
           <Button
             disabled={isSubmitting}
             onClick={() => setOpen(false)}
@@ -122,7 +123,14 @@ export function CreateLessonGroupDialog({
             disabled={isSubmitting || !isNameValid}
             onClick={handleCreate}
           >
-            {isSubmitting ? "Creating..." : "Create Group"}
+            {isSubmitting ? (
+              <>
+                <Spinner />
+                Creating...
+              </>
+            ) : (
+              "Create Group"
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

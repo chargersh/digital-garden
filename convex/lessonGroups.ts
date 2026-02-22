@@ -219,3 +219,78 @@ export const ensureDefaultForSubject = mutation({
     };
   },
 });
+
+export const remove = mutation({
+  args: {
+    groupId: v.id("lessonGroups"),
+  },
+  returns: v.object({
+    deletedNodeIds: v.array(v.id("lessonNodes")),
+  }),
+  handler: async (ctx, args) => {
+    const group = await ctx.db.get(args.groupId);
+    if (!group) {
+      throw new Error(`Lesson group "${args.groupId}" was not found.`);
+    }
+
+    const groupNodes = await ctx.db
+      .query("lessonNodes")
+      .withIndex("by_subjectId_and_groupId_and_parentNodeId_and_order", (q) =>
+        q.eq("subjectId", group.subjectId).eq("groupId", group._id)
+      )
+      .collect();
+
+    const deletedNodeIds = groupNodes.map((node) => node._id);
+
+    for (const node of groupNodes) {
+      if (node.kind !== "lesson") {
+        continue;
+      }
+
+      const content = await ctx.db
+        .query("lessonContent")
+        .withIndex("by_nodeId", (q) => q.eq("nodeId", node._id))
+        .unique();
+
+      if (content) {
+        await ctx.db.delete(content._id);
+      }
+    }
+
+    for (const node of groupNodes) {
+      await ctx.db.delete(node._id);
+    }
+
+    await ctx.db.delete(group._id);
+
+    const remainingGroups = await ctx.db
+      .query("lessonGroups")
+      .withIndex("by_subjectId_and_order", (q) =>
+        q.eq("subjectId", group.subjectId)
+      )
+      .collect();
+
+    for (const [index, remainingGroup] of remainingGroups.entries()) {
+      if (remainingGroup.order === index) {
+        continue;
+      }
+
+      await ctx.db.patch(remainingGroup._id, { order: index });
+    }
+
+    if (group.isDefault) {
+      const fallbackDefault = remainingGroups[0];
+      if (fallbackDefault) {
+        await setDefaultLessonGroup(
+          ctx.db,
+          group.subjectId,
+          fallbackDefault._id
+        );
+      } else {
+        await ensureDefaultLessonGroupForSubject(ctx.db, group.subjectId);
+      }
+    }
+
+    return { deletedNodeIds };
+  },
+});
