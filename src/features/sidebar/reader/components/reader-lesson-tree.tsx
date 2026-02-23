@@ -25,7 +25,7 @@ export function ReaderLessonTree({
   return (
     <Container className={containerClassName}>
       {items.map((item) => {
-        const key = item.nodeId ?? item.href ?? item.title;
+        const key = item.nodeId;
         const hasChildren = Boolean(item.items?.length);
 
         if (hasChildren && item.items) {

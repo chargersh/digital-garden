@@ -6,11 +6,13 @@ interface CreateCollapsibleButtonProps {
   ariaLabel: string;
   groupId: Id<"lessonGroups">;
   parentNodeId?: Id<"lessonNodes"> | null;
+  parentTitle: string;
   subjectId: Id<"subjects">;
 }
 
 export function CreateCollapsibleButton({
   ariaLabel,
+  parentTitle,
   groupId,
   parentNodeId = null,
   subjectId,
@@ -18,7 +20,7 @@ export function CreateCollapsibleButton({
   return (
     <CreateLessonNodeDialog
       ariaLabel={ariaLabel}
-      description="Add a section that can contain nested lessons and subsections."
+      description={`Create a section in "${parentTitle}" to organize nested lessons and subsections.`}
       errorMessage="Could not create collapsible."
       groupId={groupId}
       kind="collapsible"

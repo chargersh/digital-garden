@@ -6,11 +6,13 @@ interface CreateLessonButtonProps {
   ariaLabel: string;
   groupId: Id<"lessonGroups">;
   parentNodeId?: Id<"lessonNodes"> | null;
+  parentTitle: string;
   subjectId: Id<"subjects">;
 }
 
 export function CreateLessonButton({
   ariaLabel,
+  parentTitle,
   groupId,
   parentNodeId = null,
   subjectId,
@@ -18,7 +20,7 @@ export function CreateLessonButton({
   return (
     <CreateLessonNodeDialog
       ariaLabel={ariaLabel}
-      description="Add a lesson as draft now, then edit and publish when ready."
+      description={`Create a draft lesson in "${parentTitle}". You can edit and publish it later.`}
       errorMessage="Could not create lesson."
       groupId={groupId}
       kind="lesson"

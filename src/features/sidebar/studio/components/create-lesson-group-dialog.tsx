@@ -75,7 +75,7 @@ export function CreateLessonGroupDialog({
     <Dialog onOpenChange={handleOpenChange} open={open}>
       <DialogTrigger
         aria-label="Create lesson group"
-        render={<Button size="sm" variant="outline" />}
+        render={<Button size="sm" />}
       >
         <PlusIcon aria-hidden="true" />
         New Lesson Group

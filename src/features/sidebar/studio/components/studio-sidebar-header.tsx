@@ -16,7 +16,7 @@ export function StudioSidebarHeader({
   subjectSlug,
 }: StudioSidebarHeaderProps) {
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-3">
       <SubjectSelector subjectName={subjectName} subjectSlug={subjectSlug} />
       <CreateLessonGroupDialog subjectId={subjectId} />
     </div>

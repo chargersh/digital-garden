@@ -30,7 +30,7 @@ export function StudioLessonTree({
   return (
     <Container className={containerClassName}>
       {items.map((item) => {
-        const key = item.nodeId ?? item.href ?? item.title;
+        const key = item.nodeId;
 
         if (item.kind === "collapsible") {
           return (

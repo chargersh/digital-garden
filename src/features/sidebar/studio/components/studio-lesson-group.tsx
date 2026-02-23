@@ -37,11 +37,13 @@ export function StudioLessonGroup({
           <CreateLessonButton
             ariaLabel={`Create lesson in ${title}`}
             groupId={groupId}
+            parentTitle={title}
             subjectId={subjectId}
           />
           <CreateCollapsibleButton
             ariaLabel={`Create collapsible in ${title}`}
             groupId={groupId}
+            parentTitle={title}
             subjectId={subjectId}
           />
           <DeleteLessonGroupDialog groupId={groupId} title={title} />

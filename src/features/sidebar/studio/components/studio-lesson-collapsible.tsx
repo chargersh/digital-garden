@@ -82,12 +82,14 @@ export function StudioLessonCollapsible({
               ariaLabel={`Create lesson in ${title}`}
               groupId={groupId}
               parentNodeId={nodeId}
+              parentTitle={title}
               subjectId={subjectId}
             />
             <CreateCollapsibleButton
               ariaLabel={`Create collapsible in ${title}`}
               groupId={groupId}
               parentNodeId={nodeId}
+              parentTitle={title}
               subjectId={subjectId}
             />
             <DeleteLessonNodeDialog
