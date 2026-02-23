@@ -11,7 +11,6 @@ export interface LessonNode {
   slug: string;
   status: LessonNodeStatus;
   title: string;
-  uid: string;
 }
 
 export interface LessonGroup {

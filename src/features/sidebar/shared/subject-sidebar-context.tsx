@@ -71,7 +71,7 @@ export function SubjectSidebarProvider({
 
     const lessonGroups: LessonGroup[] = sidebarTree
       ? sidebarTree.groups.map((group) => ({
-          groupId: group._id,
+          groupId: group.groupId,
           title: group.title,
           order: group.order,
           items: group.items.map((item) =>

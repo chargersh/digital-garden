@@ -86,8 +86,9 @@ export const lessonNodeSidebarItemValidator = v.object({
 });
 
 export const lessonGroupWithNodeItemsValidator = v.object({
-  ...lessonGroupFields,
-  _creationTime: v.number(),
+  groupId: v.id("lessonGroups"),
+  title: v.string(),
+  order: v.number(),
   items: v.array(lessonNodeSidebarItemValidator),
 });
 
