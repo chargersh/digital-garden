@@ -22,7 +22,6 @@ interface StudioLessonCollapsibleProps {
   className?: string;
   depth?: number;
   groupId: Id<"lessonGroups">;
-  id?: string;
   nodeId: Id<"lessonNodes">;
   subjectId: Id<"subjects">;
   title: string;
@@ -35,14 +34,17 @@ export function StudioLessonCollapsible({
   nodeId,
   subjectId,
   depth = 0,
-  id,
   className,
 }: StudioLessonCollapsibleProps) {
   const Item = getMenuItemComponent(depth);
 
   return (
     <Collapsible defaultOpen>
-      <Item className="scroll-m-4 first:scroll-m-20" data-title={title} id={id}>
+      <Item
+        className="scroll-m-4 first:scroll-m-20"
+        data-title={title}
+        id={`node-${nodeId}`}
+      >
         <div className="group/lesson-collapsible relative overflow-hidden">
           <CollapsibleTrigger asChild>
             <SidebarMenuSubButton

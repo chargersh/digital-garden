@@ -74,7 +74,7 @@ export const lessonNodeValidator = v.object({
 export const lessonNodeMutationResultValidator = v.object(lessonNodeFields);
 
 export const lessonNodeSidebarItemValidator = v.object({
-  id: v.id("lessonNodes"),
+  nodeId: v.id("lessonNodes"),
   uid: v.string(),
   kind: lessonNodeKindValidator,
   title: v.string(),

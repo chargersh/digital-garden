@@ -7,9 +7,9 @@ import {
   SidebarContent,
   SidebarHeader,
 } from "@/components/ui/sidebar";
+import { SubjectOverviewItem } from "@/features/sidebar/shared/components/subject-overview-item";
 import { useSubjectSidebar } from "@/features/sidebar/shared/subject-sidebar-context";
 import { StudioLessonGroup } from "./components/studio-lesson-group";
-import { StudioLessonItem } from "./components/studio-lesson-item";
 import { StudioSidebarHeader } from "./components/studio-sidebar-header";
 
 export function StudioSidebar(props: ComponentProps<typeof Sidebar>) {
@@ -39,12 +39,7 @@ export function StudioSidebar(props: ComponentProps<typeof Sidebar>) {
           </div>
         )}
         {status === "ready" && (
-          <StudioLessonItem
-            className="mt-0 lg:mt-0"
-            href={subjectHref}
-            id={`overview-${subjectSlug}`}
-            title="Overview"
-          />
+          <SubjectOverviewItem className="mt-0 lg:mt-0" href={subjectHref} />
         )}
         {status === "ready" && lessonGroups.length === 0 && (
           <div className="px-4 py-3 text-muted-foreground text-sm">

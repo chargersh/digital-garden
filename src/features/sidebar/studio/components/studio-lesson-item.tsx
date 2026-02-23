@@ -19,8 +19,7 @@ interface StudioLessonItemProps {
   className?: string;
   depth?: number;
   href: string;
-  id?: string;
-  nodeId?: Id<"lessonNodes">;
+  nodeId: Id<"lessonNodes">;
   nodeKind?: "collapsible" | "lesson";
   status?: LessonNodeStatus;
   title: string;
@@ -29,7 +28,6 @@ interface StudioLessonItemProps {
 export function StudioLessonItem({
   title,
   href,
-  id,
   nodeId,
   nodeKind = "lesson",
   status,
@@ -50,7 +48,7 @@ export function StudioLessonItem({
     <Item
       className="group/lesson-item relative scroll-m-4 overflow-hidden first:scroll-m-20"
       data-title={title}
-      id={id ?? href}
+      id={`node-${nodeId}`}
     >
       <SidebarMenuSubButton
         asChild
@@ -81,15 +79,13 @@ export function StudioLessonItem({
           </div>
         </Link>
       </SidebarMenuSubButton>
-      {nodeId ? (
-        <StudioSlideActionsRail scope="lesson-item">
-          <DeleteLessonNodeDialog
-            nodeId={nodeId}
-            nodeKind={nodeKind}
-            title={title}
-          />
-        </StudioSlideActionsRail>
-      ) : null}
+      <StudioSlideActionsRail scope="lesson-item">
+        <DeleteLessonNodeDialog
+          nodeId={nodeId}
+          nodeKind={nodeKind}
+          title={title}
+        />
+      </StudioSlideActionsRail>
     </Item>
   );
 }

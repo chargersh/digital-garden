@@ -6,9 +6,9 @@ type LessonNodeDoc = Doc<"lessonNodes">;
 type LessonNodeResult = Omit<LessonNodeDoc, "_creationTime">;
 
 export interface SidebarLessonNode {
-  id: Id<"lessonNodes">;
   items?: SidebarLessonNode[];
   kind: LessonNodeDoc["kind"];
+  nodeId: Id<"lessonNodes">;
   slug: string;
   status: LessonNodeDoc["status"];
   title: string;
@@ -282,7 +282,7 @@ export const buildSidebarTree = async (
         return null;
       }
       return {
-        id: node._id,
+        nodeId: node._id,
         uid: node.uid,
         kind: node.kind,
         title: node.title,
@@ -299,7 +299,7 @@ export const buildSidebarTree = async (
     }
 
     return {
-      id: node._id,
+      nodeId: node._id,
       uid: node.uid,
       kind: node.kind,
       title: node.title,

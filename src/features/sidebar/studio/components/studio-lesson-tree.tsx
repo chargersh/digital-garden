@@ -30,16 +30,15 @@ export function StudioLessonTree({
   return (
     <Container className={containerClassName}>
       {items.map((item) => {
-        const key = item.id ?? item.href ?? item.title;
+        const key = item.nodeId ?? item.href ?? item.title;
 
         if (item.kind === "collapsible") {
           return (
             <StudioLessonCollapsible
               depth={depth}
               groupId={groupId}
-              id={item.id}
               key={key}
-              nodeId={item.id}
+              nodeId={item.nodeId}
               subjectId={subjectId}
               title={item.title}
             >
@@ -62,9 +61,8 @@ export function StudioLessonTree({
           <StudioLessonItem
             depth={depth}
             href={item.href}
-            id={item.id}
             key={key}
-            nodeId={item.id}
+            nodeId={item.nodeId}
             nodeKind={item.kind}
             status={item.status}
             title={item.title}

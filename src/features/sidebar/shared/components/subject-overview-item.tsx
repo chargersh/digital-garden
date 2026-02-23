@@ -1,10 +1,8 @@
 "use client";
 
-import type { Id } from "@convex/_generated/dataModel";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { CSSProperties } from "react";
-
 import { SidebarMenuSubButton } from "@/components/ui/sidebar";
 import {
   getIndent,
@@ -12,30 +10,24 @@ import {
 } from "@/features/sidebar/shared/components/lesson-row-utils";
 import { cn } from "@/lib/utils";
 
-interface ReaderLessonItemProps {
+interface SubjectOverviewItemProps {
   className?: string;
-  depth?: number;
   href: string;
-  nodeId: Id<"lessonNodes">;
-  title: string;
 }
 
-export function ReaderLessonItem({
-  title,
+export function SubjectOverviewItem({
   href,
-  nodeId,
-  depth = 0,
   className,
-}: ReaderLessonItemProps) {
-  const Item = getMenuItemComponent(depth);
+}: SubjectOverviewItemProps) {
+  const Item = getMenuItemComponent(0);
   const pathname = usePathname();
   const isActive = pathname === href;
 
   return (
     <Item
       className="scroll-m-4 first:scroll-m-20"
-      data-title={title}
-      id={`node-${nodeId}`}
+      data-title="Overview"
+      id={href}
     >
       <SidebarMenuSubButton
         asChild
@@ -55,13 +47,13 @@ export function ReaderLessonItem({
         isActive={isActive}
         style={
           {
-            paddingLeft: getIndent(depth),
+            paddingLeft: getIndent(0),
           } as CSSProperties
         }
       >
         <Link href={href}>
           <div className="flex flex-1 items-center space-x-2.5">
-            <div>{title}</div>
+            <div>Overview</div>
           </div>
         </Link>
       </SidebarMenuSubButton>

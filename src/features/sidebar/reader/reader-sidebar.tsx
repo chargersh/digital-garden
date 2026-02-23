@@ -7,9 +7,9 @@ import {
   SidebarContent,
   SidebarHeader,
 } from "@/components/ui/sidebar";
+import { SubjectOverviewItem } from "@/features/sidebar/shared/components/subject-overview-item";
 import { useSubjectSidebar } from "@/features/sidebar/shared/subject-sidebar-context";
 import { ReaderLessonGroup } from "./components/reader-lesson-group";
-import { ReaderLessonItem } from "./components/reader-lesson-item";
 import { ReaderSidebarHeader } from "./components/reader-sidebar-header";
 
 export function ReaderSidebar(props: ComponentProps<typeof Sidebar>) {
@@ -32,12 +32,7 @@ export function ReaderSidebar(props: ComponentProps<typeof Sidebar>) {
           </div>
         )}
         {status === "ready" && (
-          <ReaderLessonItem
-            className="mt-0 lg:mt-0"
-            href={subjectHref}
-            id={`overview-${subjectSlug}`}
-            title="Overview"
-          />
+          <SubjectOverviewItem className="mt-0 lg:mt-0" href={subjectHref} />
         )}
         {status === "ready" && lessonGroups.length === 0 && (
           <div className="px-4 py-3 text-muted-foreground text-sm">
