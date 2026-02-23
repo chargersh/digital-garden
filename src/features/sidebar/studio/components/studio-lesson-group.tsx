@@ -46,7 +46,11 @@ export function StudioLessonGroup({
             parentTitle={title}
             subjectId={subjectId}
           />
-          <DeleteLessonGroupDialog groupId={groupId} title={title} />
+          <DeleteLessonGroupDialog
+            childItems={items}
+            groupId={groupId}
+            title={title}
+          />
         </StudioSlideActionsRail>
       </SidebarGroupLabel>
       <SidebarGroupContent>

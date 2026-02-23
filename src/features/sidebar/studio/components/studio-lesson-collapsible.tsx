@@ -11,6 +11,7 @@ import {
   getIndent,
   getMenuItemComponent,
 } from "@/features/sidebar/shared/components/lesson-row-utils";
+import type { LessonNode } from "@/features/sidebar/shared/types";
 import { cn } from "@/lib/utils";
 import { CreateCollapsibleButton } from "./create-collapsible-button";
 import { CreateLessonButton } from "./create-lesson-button";
@@ -18,6 +19,7 @@ import { DeleteLessonNodeDialog } from "./delete-lesson-node-dialog";
 import { StudioSlideActionsRail } from "./studio-slide-actions-rail";
 
 interface StudioLessonCollapsibleProps {
+  childItems: LessonNode[];
   children: ReactNode;
   className?: string;
   depth?: number;
@@ -31,6 +33,7 @@ export function StudioLessonCollapsible({
   title,
   children,
   groupId,
+  childItems,
   nodeId,
   subjectId,
   depth = 0,
@@ -93,6 +96,7 @@ export function StudioLessonCollapsible({
               subjectId={subjectId}
             />
             <DeleteLessonNodeDialog
+              childItems={childItems}
               nodeId={nodeId}
               nodeKind="collapsible"
               title={title}

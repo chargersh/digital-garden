@@ -35,6 +35,7 @@ export function StudioLessonTree({
         if (item.kind === "collapsible") {
           return (
             <StudioLessonCollapsible
+              childItems={item.items ?? []}
               depth={depth}
               groupId={groupId}
               key={key}
