@@ -48,9 +48,9 @@ export function ReaderSidebar(props: ComponentProps<typeof Sidebar>) {
           lessonGroups.length > 0 &&
           lessonGroups.map((group) => (
             <ReaderLessonGroup
-              id={group.id}
+              groupId={group.groupId}
               items={group.items}
-              key={group.id}
+              key={group.groupId}
               title={group.title}
             />
           ))}

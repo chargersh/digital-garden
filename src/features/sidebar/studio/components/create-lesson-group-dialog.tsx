@@ -34,15 +34,10 @@ export function CreateLessonGroupDialog({
   const trimmedName = groupName.trim();
   const isNameValid = trimmedName.length >= 5;
 
-  const reset = () => {
-    setGroupName("");
-    setIsSubmitting(false);
-  };
-
   const handleOpenChange = (nextOpen: boolean) => {
     setOpen(nextOpen);
     if (!nextOpen) {
-      reset();
+      setGroupName("");
     }
   };
 
@@ -64,7 +59,7 @@ export function CreateLessonGroupDialog({
         title: trimmedName,
       });
       setOpen(false);
-      reset();
+      setGroupName("");
     } catch (submissionError) {
       const message =
         submissionError instanceof Error
@@ -113,7 +108,7 @@ export function CreateLessonGroupDialog({
         <DialogFooter className="pt-0 sm:justify-between" variant="bare">
           <Button
             disabled={isSubmitting}
-            onClick={() => setOpen(false)}
+            onClick={() => handleOpenChange(false)}
             type="button"
             variant="outline"
           >

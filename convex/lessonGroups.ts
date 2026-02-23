@@ -243,6 +243,8 @@ export const remove = mutation({
     const deletedNodeIds = groupNodes.map((node) => node._id);
 
     for (const node of groupNodes) {
+      // Only lesson nodes currently own rows in `lessonContent`.
+      // If another kind starts owning content, update this guard and cleanup.
       if (node.kind !== "lesson") {
         continue;
       }

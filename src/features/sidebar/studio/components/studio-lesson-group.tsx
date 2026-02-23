@@ -15,7 +15,6 @@ import { StudioSlideActionsRail } from "./studio-slide-actions-rail";
 interface StudioLessonGroupProps {
   className?: string;
   groupId: Id<"lessonGroups">;
-  id?: string;
   items: LessonNode[];
   subjectId: Id<"subjects">;
   title: string;
@@ -26,13 +25,12 @@ export function StudioLessonGroup({
   title,
   items,
   subjectId,
-  id,
   className,
 }: StudioLessonGroupProps) {
   return (
     <SidebarGroup className={cn("mt-4 p-0 lg:mt-5", className)}>
       <SidebarGroupLabel className="group/lesson-group relative mb-2 w-full overflow-hidden pl-4 font-medium text-foreground text-sm lg:mb-1.5">
-        <h5 className="min-w-0 flex-1 truncate" id={id}>
+        <h5 className="min-w-0 flex-1 truncate" id={`group-${groupId}`}>
           {title}
         </h5>
         <StudioSlideActionsRail scope="lesson-group">

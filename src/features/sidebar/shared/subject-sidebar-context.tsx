@@ -74,7 +74,6 @@ export function SubjectSidebarProvider({
           groupId: group._id,
           title: group.title,
           order: group.order,
-          id: `group-${group.uid}`,
           items: group.items.map((item) =>
             mapSidebarNodeForRoute(item, subjectSlug, routePrefix)
           ),

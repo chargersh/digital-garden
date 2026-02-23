@@ -48,7 +48,7 @@ export function StudioLessonItem({
 
   return (
     <Item
-      className="group/lesson-item scroll-m-4 overflow-hidden first:scroll-m-20"
+      className="group/lesson-item relative scroll-m-4 overflow-hidden first:scroll-m-20"
       data-title={title}
       id={id ?? href}
     >

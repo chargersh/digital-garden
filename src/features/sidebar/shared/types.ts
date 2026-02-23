@@ -17,7 +17,6 @@ export interface LessonNode {
 export interface LessonGroup {
   className?: string;
   groupId: Id<"lessonGroups">;
-  id?: string;
   items: LessonNode[];
   order: number;
   title: string;

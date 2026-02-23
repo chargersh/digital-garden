@@ -56,7 +56,6 @@ export function StudioSidebar(props: ComponentProps<typeof Sidebar>) {
           lessonGroups.map((group) => (
             <StudioLessonGroup
               groupId={group.groupId}
-              id={group.id}
               items={group.items}
               key={group.groupId}
               subjectId={subjectId}

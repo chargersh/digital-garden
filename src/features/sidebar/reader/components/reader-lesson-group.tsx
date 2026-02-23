@@ -1,3 +1,4 @@
+import type { Id } from "@convex/_generated/dataModel";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -9,7 +10,7 @@ import { ReaderLessonTree } from "./reader-lesson-tree";
 
 interface ReaderLessonGroupProps {
   className?: string;
-  id?: string;
+  groupId: Id<"lessonGroups">;
   items: LessonNode[];
   title: string;
 }
@@ -17,7 +18,7 @@ interface ReaderLessonGroupProps {
 export function ReaderLessonGroup({
   title,
   items,
-  id,
+  groupId,
   className,
 }: ReaderLessonGroupProps) {
   return (
@@ -26,7 +27,7 @@ export function ReaderLessonGroup({
         asChild
         className="mb-2 pl-4 font-medium text-foreground text-sm lg:mb-1.5"
       >
-        <h5 id={id}>{title}</h5>
+        <h5 id={`group-${groupId}`}>{title}</h5>
       </SidebarGroupLabel>
       <SidebarGroupContent>
         <ReaderLessonTree items={items} />

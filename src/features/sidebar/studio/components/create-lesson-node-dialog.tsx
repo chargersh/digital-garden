@@ -54,15 +54,10 @@ export function CreateLessonNodeDialog({
   const trimmedName = nodeName.trim();
   const isNameValid = trimmedName.length > 0;
 
-  const reset = () => {
-    setNodeName("");
-    setIsSubmitting(false);
-  };
-
   const handleOpenChange = (nextOpen: boolean) => {
     setOpen(nextOpen);
     if (!nextOpen) {
-      reset();
+      setNodeName("");
     }
   };
 
@@ -83,7 +78,7 @@ export function CreateLessonNodeDialog({
         uid: crypto.randomUUID(),
       });
       setOpen(false);
-      reset();
+      setNodeName("");
     } catch (error) {
       const message = error instanceof Error ? error.message : errorMessage;
       toast.error(message);
@@ -126,7 +121,7 @@ export function CreateLessonNodeDialog({
         <DialogFooter className="pt-0 sm:justify-between" variant="bare">
           <Button
             disabled={isSubmitting}
-            onClick={() => setOpen(false)}
+            onClick={() => handleOpenChange(false)}
             type="button"
             variant="outline"
           >
