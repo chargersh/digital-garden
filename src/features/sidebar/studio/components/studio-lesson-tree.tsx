@@ -1,3 +1,4 @@
+import type { Id } from "@convex/_generated/dataModel";
 import { SidebarMenu, SidebarMenuSub } from "@/components/ui/sidebar";
 import type { LessonNode } from "@/features/sidebar/shared/types";
 import { cn } from "@/lib/utils";
@@ -8,11 +9,15 @@ interface StudioLessonTreeProps {
   asSubmenu?: boolean;
   className?: string;
   depth?: number;
+  groupId: Id<"lessonGroups">;
   items: LessonNode[];
+  subjectId: Id<"subjects">;
 }
 
 export function StudioLessonTree({
   items,
+  groupId,
+  subjectId,
   depth = 0,
   asSubmenu = false,
   className,
@@ -25,20 +30,24 @@ export function StudioLessonTree({
   return (
     <Container className={containerClassName}>
       {items.map((item) => {
-        const key = item.id ?? item.href ?? item.title;
+        const key = item.nodeId ?? item.href ?? item.title;
 
         if (item.kind === "collapsible") {
           return (
             <StudioLessonCollapsible
               depth={depth}
-              id={item.id}
+              groupId={groupId}
               key={key}
+              nodeId={item.nodeId}
+              subjectId={subjectId}
               title={item.title}
             >
               <StudioLessonTree
                 asSubmenu
                 depth={depth + 1}
+                groupId={groupId}
                 items={item.items ?? []}
+                subjectId={subjectId}
               />
             </StudioLessonCollapsible>
           );
@@ -52,8 +61,10 @@ export function StudioLessonTree({
           <StudioLessonItem
             depth={depth}
             href={item.href}
-            id={item.id}
             key={key}
+            nodeId={item.nodeId}
+            nodeKind={item.kind}
+            status={item.status}
             title={item.title}
           />
         );

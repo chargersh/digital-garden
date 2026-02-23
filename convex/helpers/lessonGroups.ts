@@ -1,5 +1,8 @@
 import type { Id } from "../_generated/dataModel";
 import type { DatabaseReader, DatabaseWriter } from "../_generated/server";
+import { slugifyValue } from "./common";
+
+const MAX_UNIQUE_ATTEMPTS = 100;
 
 export const getNextLessonGroupOrder = async (
   db: DatabaseReader,
@@ -52,6 +55,39 @@ export const assertUniqueLessonGroupSlug = async (
     throw new Error(
       `Lesson group slug "${slug}" is already in use for this subject.`
     );
+  }
+};
+
+export const buildUniqueLessonGroupSlug = async (
+  db: DatabaseReader,
+  subjectId: Id<"subjects">,
+  titleOrSlug: string,
+  excludeId?: Id<"lessonGroups">
+): Promise<string> => {
+  const baseSlug = slugifyValue(titleOrSlug);
+  let attempt = 0;
+
+  while (true) {
+    if (attempt >= MAX_UNIQUE_ATTEMPTS) {
+      throw new Error(
+        `Could not generate a unique lesson group slug for "${baseSlug}" after ${MAX_UNIQUE_ATTEMPTS} attempts.`
+      );
+    }
+
+    const suffix = attempt === 0 ? "" : `-${attempt + 1}`;
+    const candidate = `${baseSlug}${suffix}`;
+    const existing = await db
+      .query("lessonGroups")
+      .withIndex("by_subjectId_and_slug", (q) =>
+        q.eq("subjectId", subjectId).eq("slug", candidate)
+      )
+      .unique();
+
+    if (!existing || existing._id === excludeId) {
+      return candidate;
+    }
+
+    attempt += 1;
   }
 };
 

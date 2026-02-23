@@ -6,13 +6,20 @@ type LessonNodeDoc = Doc<"lessonNodes">;
 type LessonNodeResult = Omit<LessonNodeDoc, "_creationTime">;
 
 export interface SidebarLessonNode {
-  id: Id<"lessonNodes">;
   items?: SidebarLessonNode[];
   kind: LessonNodeDoc["kind"];
+  nodeId: Id<"lessonNodes">;
   slug: string;
   status: LessonNodeDoc["status"];
   title: string;
   uid: string;
+}
+
+interface SidebarLessonGroup {
+  groupId: Id<"lessonGroups">;
+  items: SidebarLessonNode[];
+  order: number;
+  title: string;
 }
 
 export const buildDefaultLessonDescription = (title: string): string =>
@@ -222,7 +229,7 @@ export const buildSidebarTree = async (
   includeUnpublished: boolean,
   includeEmptyCollapsibles: boolean
 ): Promise<{
-  groups: Array<Doc<"lessonGroups"> & { items: SidebarLessonNode[] }>;
+  groups: SidebarLessonGroup[];
 }> => {
   // This loads all nodes for the subject to build a fully ordered in-memory tree.
   // If subjects grow very large, consider pagination/lazy loading by group.
@@ -282,7 +289,7 @@ export const buildSidebarTree = async (
         return null;
       }
       return {
-        id: node._id,
+        nodeId: node._id,
         uid: node.uid,
         kind: node.kind,
         title: node.title,
@@ -299,7 +306,7 @@ export const buildSidebarTree = async (
     }
 
     return {
-      id: node._id,
+      nodeId: node._id,
       uid: node.uid,
       kind: node.kind,
       title: node.title,
@@ -311,7 +318,9 @@ export const buildSidebarTree = async (
 
   return {
     groups: groups.map((group) => ({
-      ...group,
+      groupId: group._id,
+      title: group.title,
+      order: group.order,
       items: (rootsByGroup.get(group._id) ?? [])
         .map((node) => buildVisibleNode(node._id))
         .filter((item): item is SidebarLessonNode => item !== null),

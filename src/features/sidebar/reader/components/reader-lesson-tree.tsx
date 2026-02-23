@@ -25,15 +25,15 @@ export function ReaderLessonTree({
   return (
     <Container className={containerClassName}>
       {items.map((item) => {
-        const key = item.id ?? item.href ?? item.title;
+        const key = item.nodeId ?? item.href ?? item.title;
         const hasChildren = Boolean(item.items?.length);
 
         if (hasChildren && item.items) {
           return (
             <ReaderLessonCollapsible
               depth={depth}
-              id={item.id}
               key={key}
+              nodeId={item.nodeId}
               title={item.title}
             >
               <ReaderLessonTree
@@ -53,8 +53,8 @@ export function ReaderLessonTree({
           <ReaderLessonItem
             depth={depth}
             href={item.href}
-            id={item.id}
             key={key}
+            nodeId={item.nodeId}
             title={item.title}
           />
         );

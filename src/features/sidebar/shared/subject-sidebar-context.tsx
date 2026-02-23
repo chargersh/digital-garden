@@ -26,6 +26,7 @@ interface SubjectSidebarContextValue {
   lessonGroups: LessonGroup[];
   status: "loading" | "ready";
   subjectHref: string;
+  subjectId: Id<"subjects">;
   subjectName: string;
   subjectSlug: string;
 }
@@ -70,9 +71,9 @@ export function SubjectSidebarProvider({
 
     const lessonGroups: LessonGroup[] = sidebarTree
       ? sidebarTree.groups.map((group) => ({
+          groupId: group.groupId,
           title: group.title,
           order: group.order,
-          id: `group-${group.uid}`,
           items: group.items.map((item) =>
             mapSidebarNodeForRoute(item, subjectSlug, routePrefix)
           ),
@@ -91,6 +92,7 @@ export function SubjectSidebarProvider({
         breadcrumbItems,
         lessonGroups,
         status,
+        subjectId,
         subjectHref,
         subjectName,
         subjectSlug,
@@ -107,6 +109,7 @@ export function SubjectSidebarProvider({
         ],
         lessonGroups,
         status,
+        subjectId,
         subjectHref,
         subjectName,
         subjectSlug,
@@ -132,6 +135,7 @@ export function SubjectSidebarProvider({
         ],
         lessonGroups,
         status,
+        subjectId,
         subjectHref,
         subjectName,
         subjectSlug,
@@ -148,11 +152,12 @@ export function SubjectSidebarProvider({
       ],
       lessonGroups,
       status,
+      subjectId,
       subjectHref,
       subjectName,
       subjectSlug,
     };
-  }, [pathname, sidebarTree, subjectName, subjectSlug]);
+  }, [pathname, sidebarTree, subjectId, subjectName, subjectSlug]);
 
   return (
     <SubjectSidebarContext.Provider value={value}>

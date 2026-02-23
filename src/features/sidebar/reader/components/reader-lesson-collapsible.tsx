@@ -1,3 +1,4 @@
+import type { Id } from "@convex/_generated/dataModel";
 import { ChevronRight } from "lucide-react";
 import type { CSSProperties, ReactNode } from "react";
 import {
@@ -16,22 +17,26 @@ interface ReaderLessonCollapsibleProps {
   children: ReactNode;
   className?: string;
   depth?: number;
-  id?: string;
+  nodeId: Id<"lessonNodes">;
   title: string;
 }
 
 export function ReaderLessonCollapsible({
   title,
   children,
+  nodeId,
   depth = 0,
-  id,
   className,
 }: ReaderLessonCollapsibleProps) {
   const Item = getMenuItemComponent(depth);
 
   return (
     <Collapsible defaultOpen>
-      <Item className="scroll-m-4 first:scroll-m-20" data-title={title} id={id}>
+      <Item
+        className="scroll-m-4 first:scroll-m-20"
+        data-title={title}
+        id={`node-${nodeId}`}
+      >
         <CollapsibleTrigger asChild>
           <SidebarMenuSubButton
             asChild
