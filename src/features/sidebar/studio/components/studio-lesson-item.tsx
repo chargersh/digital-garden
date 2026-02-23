@@ -1,11 +1,14 @@
 "use client";
 
 import type { Id } from "@convex/_generated/dataModel";
+import { GripVerticalIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { CSSProperties } from "react";
+import type { ComponentProps, CSSProperties } from "react";
 
+import { Button } from "@/components/ui/button";
 import { SidebarMenuSubButton } from "@/components/ui/sidebar";
+import { SortableItemHandle } from "@/components/ui/sortable";
 import {
   getIndent,
   getMenuItemComponent,
@@ -15,8 +18,8 @@ import { cn } from "@/lib/utils";
 import { DeleteLessonNodeDialog } from "./delete-lesson-node-dialog";
 import { StudioSlideActionsRail } from "./studio-slide-actions-rail";
 
-interface StudioLessonItemProps {
-  className?: string;
+interface StudioLessonItemCustomProps {
+  actionsDisabled?: boolean;
   depth?: number;
   href: string;
   nodeId: Id<"lessonNodes">;
@@ -25,14 +28,22 @@ interface StudioLessonItemProps {
   title: string;
 }
 
+type StudioLessonItemElementProps = Omit<ComponentProps<"li">, "title">;
+
+type StudioLessonItemProps = StudioLessonItemCustomProps &
+  StudioLessonItemElementProps;
+
 export function StudioLessonItem({
   title,
   href,
   nodeId,
   nodeKind = "lesson",
   status,
+  actionsDisabled = false,
   depth = 0,
   className,
+  id,
+  ...itemProps
 }: StudioLessonItemProps) {
   const Item = getMenuItemComponent(depth);
   const pathname = usePathname();
@@ -46,9 +57,13 @@ export function StudioLessonItem({
 
   return (
     <Item
-      className="group/lesson-item relative scroll-m-4 overflow-hidden first:scroll-m-20"
+      className={cn(
+        "group/lesson-item relative scroll-m-4 overflow-hidden first:scroll-m-20",
+        className
+      )}
       data-title={title}
-      id={`node-${nodeId}`}
+      id={id ?? `node-${nodeId}`}
+      {...itemProps}
     >
       <SidebarMenuSubButton
         asChild
@@ -63,8 +78,7 @@ export function StudioLessonItem({
           "data-active:border-sidebar-primary data-active:text-sidebar-primary",
           "data-active:hover:border-sidebar-primary data-active:hover:text-sidebar-primary",
           "data-active:bg-transparent data-active:hover:bg-transparent",
-          "hover:bg-transparent active:bg-transparent",
-          className
+          "hover:bg-transparent active:bg-transparent"
         )}
         isActive={isActive}
         style={
@@ -79,12 +93,25 @@ export function StudioLessonItem({
           </div>
         </Link>
       </SidebarMenuSubButton>
-      <StudioSlideActionsRail scope="lesson-item">
+      <StudioSlideActionsRail disabled={actionsDisabled} scope="lesson-item">
         <DeleteLessonNodeDialog
           nodeId={nodeId}
           nodeKind={nodeKind}
           title={title}
         />
+        <SortableItemHandle asChild>
+          <Button
+            aria-label={`Reorder ${title}`}
+            onPointerUp={(event) => {
+              event.currentTarget.blur();
+            }}
+            size="icon-xs"
+            type="button"
+            variant="ghost"
+          >
+            <GripVerticalIcon aria-hidden="true" />
+          </Button>
+        </SortableItemHandle>
       </StudioSlideActionsRail>
     </Item>
   );

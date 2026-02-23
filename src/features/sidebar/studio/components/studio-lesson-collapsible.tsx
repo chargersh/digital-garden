@@ -1,12 +1,14 @@
 import type { Id } from "@convex/_generated/dataModel";
-import { ChevronRight } from "lucide-react";
-import type { CSSProperties, ReactNode } from "react";
+import { ChevronRight, GripVerticalIcon } from "lucide-react";
+import type { ComponentProps, CSSProperties, ReactNode } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { SidebarMenuSubButton } from "@/components/ui/sidebar";
+import { SortableItemHandle } from "@/components/ui/sortable";
 import {
   getIndent,
   getMenuItemComponent,
@@ -18,16 +20,21 @@ import { CreateLessonButton } from "./create-lesson-button";
 import { DeleteLessonNodeDialog } from "./delete-lesson-node-dialog";
 import { StudioSlideActionsRail } from "./studio-slide-actions-rail";
 
-interface StudioLessonCollapsibleProps {
+interface StudioLessonCollapsibleCustomProps {
+  actionsDisabled?: boolean;
   childItems: LessonNode[];
   children: ReactNode;
-  className?: string;
   depth?: number;
   groupId: Id<"lessonGroups">;
   nodeId: Id<"lessonNodes">;
   subjectId: Id<"subjects">;
   title: string;
 }
+
+type StudioLessonCollapsibleElementProps = Omit<ComponentProps<"li">, "title">;
+
+type StudioLessonCollapsibleProps = StudioLessonCollapsibleCustomProps &
+  StudioLessonCollapsibleElementProps;
 
 export function StudioLessonCollapsible({
   title,
@@ -36,17 +43,21 @@ export function StudioLessonCollapsible({
   childItems,
   nodeId,
   subjectId,
+  actionsDisabled = false,
   depth = 0,
   className,
+  id,
+  ...itemProps
 }: StudioLessonCollapsibleProps) {
   const Item = getMenuItemComponent(depth);
 
   return (
-    <Collapsible defaultOpen>
+    <Collapsible asChild defaultOpen>
       <Item
-        className="scroll-m-4 first:scroll-m-20"
+        className={cn("scroll-m-4 first:scroll-m-20", className)}
         data-title={title}
-        id={`node-${nodeId}`}
+        id={id ?? `node-${nodeId}`}
+        {...itemProps}
       >
         <div className="group/lesson-collapsible relative overflow-hidden">
           <CollapsibleTrigger asChild>
@@ -59,8 +70,7 @@ export function StudioLessonCollapsible({
                 "wrap-break-word hyphens-auto",
                 "text-muted-foreground",
                 "hover:border-foreground hover:text-foreground",
-                "hover:bg-transparent active:bg-transparent",
-                className
+                "hover:bg-transparent active:bg-transparent"
               )}
               style={
                 {
@@ -80,7 +90,10 @@ export function StudioLessonCollapsible({
               </button>
             </SidebarMenuSubButton>
           </CollapsibleTrigger>
-          <StudioSlideActionsRail scope="lesson-collapsible">
+          <StudioSlideActionsRail
+            disabled={actionsDisabled}
+            scope="lesson-collapsible"
+          >
             <CreateLessonButton
               ariaLabel={`Create lesson in ${title}`}
               groupId={groupId}
@@ -101,6 +114,19 @@ export function StudioLessonCollapsible({
               nodeKind="collapsible"
               title={title}
             />
+            <SortableItemHandle asChild>
+              <Button
+                aria-label={`Reorder ${title}`}
+                onPointerUp={(event) => {
+                  event.currentTarget.blur();
+                }}
+                size="icon-xs"
+                type="button"
+                variant="ghost"
+              >
+                <GripVerticalIcon aria-hidden="true" />
+              </Button>
+            </SortableItemHandle>
           </StudioSlideActionsRail>
         </div>
         <CollapsibleContent>{children}</CollapsibleContent>
