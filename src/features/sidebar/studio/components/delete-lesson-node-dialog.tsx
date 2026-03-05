@@ -25,7 +25,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import type { LessonNode } from "@/features/sidebar/shared/types";
-import { flattenChildItems } from "./delete-dialog-utils";
+import { flattenChildItems } from "./node-preview-utils";
 
 interface DeleteLessonNodeDialogProps {
   childItems?: LessonNode[];
@@ -93,7 +93,7 @@ export function DeleteLessonNodeDialog({
           {nodeKind === "collapsible" && childCount > 0 ? (
             <Accordion className="w-full">
               <AccordionItem className="border-0" value="node-children">
-                <AccordionTrigger className="rounded-md border border-border/60 bg-muted/20 px-3 py-2 text-muted-foreground text-sm leading-relaxed transition-colors hover:bg-muted/35">
+                <AccordionTrigger className="min-h-9 items-center rounded-lg border border-border/60 bg-muted/20 px-[calc(--spacing(3)-1px)] py-1.5 text-muted-foreground text-sm leading-normal transition-colors hover:bg-muted/35 **:data-[slot=accordion-indicator]:translate-y-0 sm:min-h-8">
                   {`It will also delete ${childCount} ${nestedItemLabel}.`}
                 </AccordionTrigger>
                 <AccordionContent className="pt-2 pb-0">

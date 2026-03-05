@@ -1,6 +1,6 @@
 import type { LessonNode } from "@/features/sidebar/shared/types";
 
-interface DescendantPreviewItem {
+export interface DescendantPreviewItem {
   depth: number;
   kind: LessonNode["kind"];
   nodeId: LessonNode["nodeId"];
