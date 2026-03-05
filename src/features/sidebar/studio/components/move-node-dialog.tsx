@@ -53,6 +53,7 @@ interface MoveNodeDialogProps {
 }
 
 interface PathSegment {
+  id: string;
   label: string;
   type: "collapsible" | "group";
 }
@@ -81,7 +82,9 @@ const buildCurrentPath = (
     return [];
   }
 
-  const segments: PathSegment[] = [{ label: group.title, type: "group" }];
+  const segments: PathSegment[] = [
+    { id: group.groupId, label: group.title, type: "group" },
+  ];
 
   const walkItems = (items: LessonNode[]): boolean => {
     for (const item of items) {
@@ -89,7 +92,11 @@ const buildCurrentPath = (
         return true;
       }
       if (item.items && item.items.length > 0) {
-        segments.push({ label: item.title, type: "collapsible" });
+        segments.push({
+          id: item.nodeId,
+          label: item.title,
+          type: "collapsible",
+        });
         if (walkItems(item.items)) {
           return true;
         }
@@ -360,13 +367,17 @@ export function MoveNodeDialog({
     }
 
     const segments: PathSegment[] = [
-      { label: targetGroup.title, type: "group" },
+      { id: targetGroup.groupId, label: targetGroup.title, type: "group" },
     ];
 
     for (const parentId of selectedParentPath) {
       const parentTitle = findNodeTitle(targetGroup.items, parentId);
       if (parentTitle) {
-        segments.push({ label: parentTitle, type: "collapsible" });
+        segments.push({
+          id: parentId,
+          label: parentTitle,
+          type: "collapsible",
+        });
       }
     }
 
@@ -646,10 +657,7 @@ function PathBreadcrumb({
   return (
     <div className="custom-scrollbar flex min-h-9 items-center gap-1 overflow-x-auto whitespace-nowrap rounded-lg border border-border/60 bg-muted/20 px-[calc(--spacing(3)-1px)] py-1.5 text-sm sm:min-h-8">
       {segments.map((segment) => (
-        <span
-          className="flex items-center gap-1"
-          key={`${segment.type}-${segment.label}`}
-        >
+        <span className="flex items-center gap-1" key={segment.id}>
           {segment.type === "collapsible" && (
             <ChevronRight
               aria-hidden="true"
