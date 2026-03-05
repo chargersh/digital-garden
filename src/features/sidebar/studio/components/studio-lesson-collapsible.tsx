@@ -1,14 +1,12 @@
 import type { Id } from "@convex/_generated/dataModel";
-import { ChevronRight, GripVerticalIcon } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import type { ComponentProps, CSSProperties, ReactNode } from "react";
-import { Button } from "@/components/ui/button";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { SidebarMenuSubButton } from "@/components/ui/sidebar";
-import { SortableItemHandle } from "@/components/ui/sortable";
 import {
   getIndent,
   getMenuItemComponent,
@@ -20,6 +18,7 @@ import { CreateLessonButton } from "./create-lesson-button";
 import { DeleteLessonNodeDialog } from "./delete-lesson-node-dialog";
 import { NodeContextMenu } from "./node-context-menu";
 import { StudioSlideActionsRail } from "./studio-slide-actions-rail";
+import { StudioSortableHandleButton } from "./studio-sortable-handle-button";
 
 interface StudioLessonCollapsibleCustomProps {
   actionsDisabled?: boolean;
@@ -121,19 +120,7 @@ export function StudioLessonCollapsible({
                 nodeKind="collapsible"
                 title={title}
               />
-              <SortableItemHandle asChild>
-                <Button
-                  aria-label={`Reorder ${title}`}
-                  onPointerUp={(event) => {
-                    event.currentTarget.blur();
-                  }}
-                  size="icon-xs"
-                  type="button"
-                  variant="ghost"
-                >
-                  <GripVerticalIcon aria-hidden="true" />
-                </Button>
-              </SortableItemHandle>
+              <StudioSortableHandleButton ariaLabel={`Reorder ${title}`} />
             </StudioSlideActionsRail>
           </div>
           <CollapsibleContent>{children}</CollapsibleContent>

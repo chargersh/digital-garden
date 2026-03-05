@@ -1,13 +1,10 @@
 import type { Id } from "@convex/_generated/dataModel";
-import { GripVerticalIcon } from "lucide-react";
 import type { ComponentProps } from "react";
-import { Button } from "@/components/ui/button";
 import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
 } from "@/components/ui/sidebar";
-import { SortableItemHandle } from "@/components/ui/sortable";
 import type { LessonNode } from "@/features/sidebar/shared/types";
 import { cn } from "@/lib/utils";
 import { CreateCollapsibleButton } from "./create-collapsible-button";
@@ -15,6 +12,7 @@ import { CreateLessonButton } from "./create-lesson-button";
 import { DeleteLessonGroupDialog } from "./delete-lesson-group-dialog";
 import { StudioLessonTree } from "./studio-lesson-tree";
 import { StudioSlideActionsRail } from "./studio-slide-actions-rail";
+import { StudioSortableHandleButton } from "./studio-sortable-handle-button";
 
 interface StudioLessonGroupCustomProps {
   actionsDisabled?: boolean;
@@ -62,19 +60,7 @@ export function StudioLessonGroup({
             groupId={groupId}
             title={title}
           />
-          <SortableItemHandle asChild>
-            <Button
-              aria-label={`Reorder ${title}`}
-              onPointerUp={(event) => {
-                event.currentTarget.blur();
-              }}
-              size="icon-xs"
-              type="button"
-              variant="ghost"
-            >
-              <GripVerticalIcon aria-hidden="true" />
-            </Button>
-          </SortableItemHandle>
+          <StudioSortableHandleButton ariaLabel={`Reorder ${title}`} />
         </StudioSlideActionsRail>
       </SidebarGroupLabel>
       <SidebarGroupContent>

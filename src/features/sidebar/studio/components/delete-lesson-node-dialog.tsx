@@ -78,6 +78,7 @@ export function DeleteLessonNodeDialog({
     <AlertDialog onOpenChange={setOpen} open={open}>
       <AlertDialogTrigger
         aria-label={`Delete ${title}`}
+        id={`delete-node-trigger-${nodeId}`}
         render={<Button size="icon-xs" type="button" variant="ghost" />}
       >
         <Trash2Icon aria-hidden="true" />

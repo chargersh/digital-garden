@@ -411,17 +411,12 @@ export const move = mutation({
       sourceGroupId,
       sourceParentNodeId
     );
-    if (
-      sourceGroupId !== targetGroupId ||
-      sourceParentNodeId !== targetParentNodeId
-    ) {
-      await reindexSiblingOrders(
-        ctx.db,
-        node.subjectId,
-        targetGroupId,
-        targetParentNodeId
-      );
-    }
+    await reindexSiblingOrders(
+      ctx.db,
+      node.subjectId,
+      targetGroupId,
+      targetParentNodeId
+    );
     const movedNode = await getLessonNodeOrThrow(ctx.db, node._id);
 
     return toNodeResult(movedNode);

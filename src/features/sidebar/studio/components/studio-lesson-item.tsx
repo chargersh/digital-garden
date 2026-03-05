@@ -1,14 +1,11 @@
 "use client";
 
 import type { Id } from "@convex/_generated/dataModel";
-import { GripVerticalIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ComponentProps, CSSProperties } from "react";
 
-import { Button } from "@/components/ui/button";
 import { SidebarMenuSubButton } from "@/components/ui/sidebar";
-import { SortableItemHandle } from "@/components/ui/sortable";
 import {
   getIndent,
   getMenuItemComponent,
@@ -18,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { DeleteLessonNodeDialog } from "./delete-lesson-node-dialog";
 import { NodeContextMenu } from "./node-context-menu";
 import { StudioSlideActionsRail } from "./studio-slide-actions-rail";
+import { StudioSortableHandleButton } from "./studio-sortable-handle-button";
 
 interface StudioLessonItemCustomProps {
   actionsDisabled?: boolean;
@@ -106,19 +104,7 @@ export function StudioLessonItem({
             nodeKind="lesson"
             title={title}
           />
-          <SortableItemHandle asChild>
-            <Button
-              aria-label={`Reorder ${title}`}
-              onPointerUp={(event) => {
-                event.currentTarget.blur();
-              }}
-              size="icon-xs"
-              type="button"
-              variant="ghost"
-            >
-              <GripVerticalIcon aria-hidden="true" />
-            </Button>
-          </SortableItemHandle>
+          <StudioSortableHandleButton ariaLabel={`Reorder ${title}`} />
         </StudioSlideActionsRail>
       </Item>
     </NodeContextMenu>

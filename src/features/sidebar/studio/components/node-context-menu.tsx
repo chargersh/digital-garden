@@ -40,14 +40,16 @@ export function NodeContextMenu({
           </ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>
-      <MoveNodeDialog
-        groupId={groupId}
-        nodeId={nodeId}
-        nodeKind={nodeKind}
-        onOpenChange={setIsMoveOpen}
-        open={isMoveOpen}
-        title={title}
-      />
+      {isMoveOpen ? (
+        <MoveNodeDialog
+          groupId={groupId}
+          nodeId={nodeId}
+          nodeKind={nodeKind}
+          onOpenChange={setIsMoveOpen}
+          open={isMoveOpen}
+          title={title}
+        />
+      ) : null}
     </>
   );
 }
