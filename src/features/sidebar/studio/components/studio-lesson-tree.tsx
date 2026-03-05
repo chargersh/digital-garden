@@ -159,9 +159,9 @@ export function StudioLessonTree({
                 <StudioLessonItem
                   actionsDisabled={isSorting}
                   depth={depth}
+                  groupId={groupId}
                   href={item.href}
                   nodeId={item.nodeId}
-                  nodeKind={item.kind}
                   status={item.status}
                   title={item.title}
                 />
