@@ -91,6 +91,7 @@ export function CreateLessonNodeDialog({
     <Dialog onOpenChange={handleOpenChange} open={open}>
       <DialogTrigger
         aria-label={ariaLabel}
+        id={`create-${kind}-trigger-${groupId}-${parentNodeId ?? "root"}`}
         render={<Button size="icon-xs" type="button" variant="ghost" />}
       >
         {triggerIcon}

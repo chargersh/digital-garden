@@ -28,6 +28,7 @@ interface StudioSlideActionsRailProps {
   actionsClassName?: string;
   children: ReactNode;
   className?: string;
+  disabled?: boolean;
   scope: StudioSlideActionsScope;
 }
 
@@ -36,19 +37,21 @@ export function StudioSlideActionsRail({
   scope,
   className,
   actionsClassName,
+  disabled = false,
 }: StudioSlideActionsRailProps) {
   return (
     <div
       className={cn(
         "pointer-events-none absolute inset-y-0 -right-1 z-10 flex translate-x-full items-center justify-end bg-sidebar transition-transform duration-150",
-        railVisibilityClasses[scope],
+        !disabled && railVisibilityClasses[scope],
+        disabled && "pointer-events-none translate-x-full",
         className
       )}
     >
       <div
         className={cn(
           "pointer-events-none absolute inset-y-0 right-full w-8 bg-linear-to-l from-sidebar to-transparent opacity-0 transition-opacity duration-150",
-          fadeVisibilityClasses[scope]
+          !disabled && fadeVisibilityClasses[scope]
         )}
       />
       <div className={cn("flex items-center gap-0.5 pr-1", actionsClassName)}>

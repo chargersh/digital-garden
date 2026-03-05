@@ -3,7 +3,7 @@
 import type { Id } from "@convex/_generated/dataModel";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { CSSProperties } from "react";
+import type { ComponentProps, CSSProperties } from "react";
 
 import { SidebarMenuSubButton } from "@/components/ui/sidebar";
 import {
@@ -13,26 +13,36 @@ import {
 import type { LessonNodeStatus } from "@/features/sidebar/shared/types";
 import { cn } from "@/lib/utils";
 import { DeleteLessonNodeDialog } from "./delete-lesson-node-dialog";
+import { NodeContextMenu } from "./node-context-menu";
 import { StudioSlideActionsRail } from "./studio-slide-actions-rail";
+import { StudioSortableHandleButton } from "./studio-sortable-handle-button";
 
-interface StudioLessonItemProps {
-  className?: string;
+interface StudioLessonItemCustomProps {
+  actionsDisabled?: boolean;
   depth?: number;
+  groupId: Id<"lessonGroups">;
   href: string;
   nodeId: Id<"lessonNodes">;
-  nodeKind?: "collapsible" | "lesson";
   status?: LessonNodeStatus;
   title: string;
 }
 
+type StudioLessonItemElementProps = Omit<ComponentProps<"li">, "title">;
+
+type StudioLessonItemProps = StudioLessonItemCustomProps &
+  StudioLessonItemElementProps;
+
 export function StudioLessonItem({
   title,
   href,
+  groupId,
   nodeId,
-  nodeKind = "lesson",
   status,
+  actionsDisabled = false,
   depth = 0,
   className,
+  id,
+  ...itemProps
 }: StudioLessonItemProps) {
   const Item = getMenuItemComponent(depth);
   const pathname = usePathname();
@@ -45,47 +55,58 @@ export function StudioLessonItem({
   }
 
   return (
-    <Item
-      className="group/lesson-item relative scroll-m-4 overflow-hidden first:scroll-m-20"
-      data-title={title}
-      id={`node-${nodeId}`}
+    <NodeContextMenu
+      groupId={groupId}
+      nodeId={nodeId}
+      nodeKind="lesson"
+      title={title}
     >
-      <SidebarMenuSubButton
-        asChild
+      <Item
         className={cn(
-          "h-auto rounded-none px-0 py-0",
-          "flex items-center gap-x-3 pr-3 text-left",
-          "ml-4 w-[calc(100%-1rem)] border-l py-2 lg:py-1.5",
-          statusBorderClass,
-          "wrap-break-word hyphens-auto",
-          "text-muted-foreground",
-          "hover:border-foreground hover:text-foreground",
-          "data-active:border-sidebar-primary data-active:text-sidebar-primary",
-          "data-active:hover:border-sidebar-primary data-active:hover:text-sidebar-primary",
-          "data-active:bg-transparent data-active:hover:bg-transparent",
-          "hover:bg-transparent active:bg-transparent",
+          "group/lesson-item relative scroll-m-4 overflow-hidden first:scroll-m-20",
           className
         )}
-        isActive={isActive}
-        style={
-          {
-            paddingLeft: getIndent(depth),
-          } as CSSProperties
-        }
+        data-title={title}
+        id={id ?? `node-${nodeId}`}
+        {...itemProps}
       >
-        <Link href={href}>
-          <div className="flex flex-1 items-center space-x-2.5">
-            <div>{title}</div>
-          </div>
-        </Link>
-      </SidebarMenuSubButton>
-      <StudioSlideActionsRail scope="lesson-item">
-        <DeleteLessonNodeDialog
-          nodeId={nodeId}
-          nodeKind={nodeKind}
-          title={title}
-        />
-      </StudioSlideActionsRail>
-    </Item>
+        <SidebarMenuSubButton
+          asChild
+          className={cn(
+            "h-auto rounded-none px-0 py-0",
+            "flex items-center gap-x-3 pr-3 text-left",
+            "ml-4 w-[calc(100%-1rem)] border-l py-2 lg:py-1.5",
+            statusBorderClass,
+            "wrap-break-word hyphens-auto",
+            "text-muted-foreground",
+            "hover:border-foreground hover:text-foreground",
+            "data-active:border-sidebar-primary data-active:text-sidebar-primary",
+            "data-active:hover:border-sidebar-primary data-active:hover:text-sidebar-primary",
+            "data-active:bg-transparent data-active:hover:bg-transparent",
+            "hover:bg-transparent active:bg-transparent"
+          )}
+          isActive={isActive}
+          style={
+            {
+              paddingLeft: getIndent(depth),
+            } as CSSProperties
+          }
+        >
+          <Link href={href}>
+            <div className="flex flex-1 items-center space-x-2.5">
+              <div>{title}</div>
+            </div>
+          </Link>
+        </SidebarMenuSubButton>
+        <StudioSlideActionsRail disabled={actionsDisabled} scope="lesson-item">
+          <DeleteLessonNodeDialog
+            nodeId={nodeId}
+            nodeKind="lesson"
+            title={title}
+          />
+          <StudioSortableHandleButton ariaLabel={`Reorder ${title}`} />
+        </StudioSlideActionsRail>
+      </Item>
+    </NodeContextMenu>
   );
 }

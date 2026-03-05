@@ -25,7 +25,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import type { LessonNode } from "@/features/sidebar/shared/types";
-import { flattenChildItems } from "./delete-dialog-utils";
+import { flattenChildItems } from "./node-preview-utils";
 
 interface DeleteLessonGroupDialogProps {
   childItems: LessonNode[];
@@ -71,6 +71,7 @@ export function DeleteLessonGroupDialog({
     <AlertDialog onOpenChange={setOpen} open={open}>
       <AlertDialogTrigger
         aria-label={`Delete ${title}`}
+        id={`delete-group-trigger-${groupId}`}
         render={<Button size="icon-xs" type="button" variant="ghost" />}
       >
         <Trash2Icon aria-hidden="true" />
