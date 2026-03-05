@@ -10,7 +10,7 @@ import {
   ChevronsUpDownIcon,
   ChevronUpIcon,
 } from "lucide-react";
-import type * as React from "react";
+import type { ButtonHTMLAttributes } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -45,8 +45,9 @@ function SelectButton({
   children,
   ...props
 }: SelectButtonProps) {
-  const typeValue: React.ButtonHTMLAttributes<HTMLButtonElement>["type"] =
-    render ? undefined : "button";
+  const typeValue: ButtonHTMLAttributes<HTMLButtonElement>["type"] = render
+    ? undefined
+    : "button";
 
   const defaultProps = {
     children: (

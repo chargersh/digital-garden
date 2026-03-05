@@ -352,6 +352,14 @@ export const move = mutation({
       throw new Error("Target group must belong to the same subject.");
     }
 
+    const isSameContainer =
+      sourceGroupId === targetGroupId &&
+      sourceParentNodeId === targetParentNodeId;
+
+    if (isSameContainer) {
+      return toNodeResult(node);
+    }
+
     await assertParentNodeForChild(
       ctx.db,
       node.subjectId,
@@ -359,7 +367,7 @@ export const move = mutation({
       targetParentNodeId
     );
 
-    if (targetParentNodeId) {
+    if (targetParentNodeId && targetParentNodeId !== sourceParentNodeId) {
       await assertNoNodeCycle(ctx.db, node._id, targetParentNodeId);
     }
 

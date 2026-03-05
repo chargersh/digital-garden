@@ -25,6 +25,7 @@ This repository is a personal Digital Garden for university-driven learning. Aft
 - Do not introduce unrelated refactors.
 - State assumptions explicitly when requirements are unclear.
 - Prefer explicit, maintainable TypeScript and clear naming.
+- Prioritize code quality: write the cleanest, most elegant, and most maintainable solution possible. Do not blindly replicate weak existing patterns; it is expected and safe to improve implementation quality (frontend and Convex) when doing so remains scoped to the task.
 - Do not ask the user to perform steps the agent can do itself.
 - Use relevant skills when writing or updating code.
 
