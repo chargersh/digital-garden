@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Fragment } from "react";
+import { Fragment, type ReactNode } from "react";
 import { ModeToggle } from "@/components/mode-toggle";
 import {
   Breadcrumb,
@@ -27,25 +27,30 @@ export function PageHeader() {
           />
           <Breadcrumb>
             <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <Link href="/">Home</Link>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
               {breadcrumbItems.map((item, index) => {
                 const isLast = index === breadcrumbItems.length - 1;
+                let breadcrumbContent: ReactNode;
+
+                if (isLast) {
+                  breadcrumbContent = (
+                    <BreadcrumbPage>{item.title}</BreadcrumbPage>
+                  );
+                } else if (item.href) {
+                  breadcrumbContent = (
+                    <BreadcrumbLink asChild>
+                      <Link href={item.href}>{item.title}</Link>
+                    </BreadcrumbLink>
+                  );
+                } else {
+                  breadcrumbContent = (
+                    <span className="text-muted-foreground">{item.title}</span>
+                  );
+                }
+
                 return (
                   <Fragment key={`${index}-${item.href ?? ""}-${item.title}`}>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                      {isLast || !item.href ? (
-                        <BreadcrumbPage>{item.title}</BreadcrumbPage>
-                      ) : (
-                        <BreadcrumbLink asChild>
-                          <Link href={item.href}>{item.title}</Link>
-                        </BreadcrumbLink>
-                      )}
-                    </BreadcrumbItem>
+                    {index > 0 ? <BreadcrumbSeparator /> : null}
+                    <BreadcrumbItem>{breadcrumbContent}</BreadcrumbItem>
                   </Fragment>
                 );
               })}

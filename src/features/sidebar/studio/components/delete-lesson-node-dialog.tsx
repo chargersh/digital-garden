@@ -3,7 +3,7 @@
 import { api } from "@convex/_generated/api";
 import type { Id } from "@convex/_generated/dataModel";
 import { useMutation } from "convex/react";
-import { BookOpenIcon, FolderIcon, Trash2Icon } from "lucide-react";
+import { BookOpenIcon, FolderIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -20,7 +20,6 @@ import {
   AlertDialogHeader,
   AlertDialogPopup,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
@@ -31,6 +30,8 @@ interface DeleteLessonNodeDialogProps {
   childItems?: LessonNode[];
   nodeId: Id<"lessonNodes">;
   nodeKind?: "collapsible" | "lesson";
+  onOpenChange: (open: boolean) => void;
+  open: boolean;
   title: string;
 }
 
@@ -38,10 +39,11 @@ export function DeleteLessonNodeDialog({
   childItems = [],
   nodeId,
   nodeKind = "lesson",
+  onOpenChange,
+  open,
   title,
 }: DeleteLessonNodeDialogProps) {
   const removeNode = useMutation(api.lessonNodes.removeNode);
-  const [open, setOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const descendantItems =
     nodeKind === "collapsible" ? flattenChildItems(childItems) : [];
@@ -50,9 +52,9 @@ export function DeleteLessonNodeDialog({
   const remainingCount = childCount - previewItems.length;
   const nestedItemLabel = childCount === 1 ? "nested item" : "nested items";
 
-  const nodeLabel = nodeKind === "collapsible" ? "collapsible" : "lesson";
+  const nodeLabel = nodeKind === "collapsible" ? "section" : "lesson";
   const deleteLabel =
-    nodeKind === "collapsible" ? "Delete Collapsible" : "Delete Lesson";
+    nodeKind === "collapsible" ? "Delete Section" : "Delete Lesson";
 
   const handleDelete = async () => {
     if (isDeleting) {
@@ -62,7 +64,7 @@ export function DeleteLessonNodeDialog({
     setIsDeleting(true);
     try {
       await removeNode({ nodeId });
-      setOpen(false);
+      onOpenChange(false);
     } catch (error) {
       const message =
         error instanceof Error
@@ -75,14 +77,7 @@ export function DeleteLessonNodeDialog({
   };
 
   return (
-    <AlertDialog onOpenChange={setOpen} open={open}>
-      <AlertDialogTrigger
-        aria-label={`Delete ${title}`}
-        id={`delete-node-trigger-${nodeId}`}
-        render={<Button size="icon-xs" type="button" variant="ghost" />}
-      >
-        <Trash2Icon aria-hidden="true" />
-      </AlertDialogTrigger>
+    <AlertDialog onOpenChange={onOpenChange} open={open}>
       <AlertDialogPopup>
         <AlertDialogHeader className="gap-3">
           <AlertDialogTitle>{`Delete ${nodeLabel}?`}</AlertDialogTitle>

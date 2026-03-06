@@ -21,7 +21,7 @@ export function CreateCollapsibleButton({
     <CreateLessonNodeDialog
       ariaLabel={ariaLabel}
       description={`Create a section in "${parentTitle}" to organize nested lessons and subsections.`}
-      errorMessage="Could not create collapsible."
+      errorMessage="Could not create section."
       groupId={groupId}
       kind="collapsible"
       parentNodeId={parentNodeId}

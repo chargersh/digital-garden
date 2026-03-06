@@ -15,6 +15,9 @@ import { ReaderSidebarHeader } from "./components/reader-sidebar-header";
 export function ReaderSidebar(props: ComponentProps<typeof Sidebar>) {
   const { lessonGroups, status, subjectHref, subjectName, subjectSlug } =
     useSubjectSidebar();
+  const visibleLessonGroups = lessonGroups.filter(
+    (group) => group.items.length > 0
+  );
 
   return (
     <Sidebar {...props}>
@@ -34,14 +37,14 @@ export function ReaderSidebar(props: ComponentProps<typeof Sidebar>) {
         {status === "ready" && (
           <SubjectOverviewItem className="mt-0 lg:mt-0" href={subjectHref} />
         )}
-        {status === "ready" && lessonGroups.length === 0 && (
+        {status === "ready" && visibleLessonGroups.length === 0 && (
           <div className="px-4 py-3 text-muted-foreground text-sm">
             No lessons yet.
           </div>
         )}
         {status === "ready" &&
-          lessonGroups.length > 0 &&
-          lessonGroups.map((group) => (
+          visibleLessonGroups.length > 0 &&
+          visibleLessonGroups.map((group) => (
             <ReaderLessonGroup
               groupId={group.groupId}
               items={group.items}

@@ -50,7 +50,7 @@ export function StudioLessonGroup({
             subjectId={subjectId}
           />
           <CreateCollapsibleButton
-            ariaLabel={`Create collapsible in ${title}`}
+            ariaLabel={`Create section in ${title}`}
             groupId={groupId}
             parentTitle={title}
             subjectId={subjectId}

@@ -89,7 +89,15 @@ export function SubjectSidebarProvider({
 
     if (lessonPathParts.length === 0) {
       return {
-        breadcrumbItems,
+        breadcrumbItems: [
+          {
+            title: subjectName,
+            href: subjectHref,
+          },
+          {
+            title: "Overview",
+          },
+        ],
         lessonGroups,
         status,
         subjectId,

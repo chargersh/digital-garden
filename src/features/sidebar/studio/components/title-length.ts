@@ -1,0 +1,1 @@
+export const MAX_CREATION_TITLE_LENGTH = 120;

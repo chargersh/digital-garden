@@ -12,7 +12,6 @@ import {
 } from "@/features/sidebar/shared/components/lesson-row-utils";
 import type { LessonNodeStatus } from "@/features/sidebar/shared/types";
 import { cn } from "@/lib/utils";
-import { DeleteLessonNodeDialog } from "./delete-lesson-node-dialog";
 import { NodeContextMenu } from "./node-context-menu";
 import { StudioSlideActionsRail } from "./studio-slide-actions-rail";
 import { StudioSortableHandleButton } from "./studio-sortable-handle-button";
@@ -99,11 +98,6 @@ export function StudioLessonItem({
           </Link>
         </SidebarMenuSubButton>
         <StudioSlideActionsRail disabled={actionsDisabled} scope="lesson-item">
-          <DeleteLessonNodeDialog
-            nodeId={nodeId}
-            nodeKind="lesson"
-            title={title}
-          />
           <StudioSortableHandleButton ariaLabel={`Reorder ${title}`} />
         </StudioSlideActionsRail>
       </Item>

@@ -17,6 +17,14 @@ This repository is a personal Digital Garden for university-driven learning. Aft
 - `bun run check` is the primary source of verification.
 - Do not run `bun run typecheck` or `bun run lint` separately unless explicitly requested.
 - Auto-fix lint/format issues: `bun run fix` (especially useful when `bun run check` reports linter formatting or sorting errors).
+- If `bun run check` reports formatting, import ordering, or other auto-fixable lint issues, run `bun run fix` instead of hand-editing formatting-only changes.
+
+## Convex Generated Code
+
+- Never run `bunx convex codegen`.
+- If generated Convex types or API references are genuinely stale, refresh them with `bunx convex dev --once`.
+- Do not run `bunx convex dev --once` routinely after every Convex edit; use it only when there is a clear stale-generated-code or stale-cloud-deploy issue.
+- Never edit generated Convex files by hand. This includes everything under `convex/_generated/`.
 
 ## Agent Behaviour
 
@@ -27,6 +35,7 @@ This repository is a personal Digital Garden for university-driven learning. Aft
 - Prefer explicit, maintainable TypeScript and clear naming.
 - Prioritize code quality: write the cleanest, most elegant, and most maintainable solution possible. Do not blindly replicate weak existing patterns; it is expected and safe to improve implementation quality (frontend and Convex) when doing so remains scoped to the task.
 - Do not ask the user to perform steps the agent can do itself.
+- For frontend work involving shadcn primitives or components explicitly mentioned in the request (for example `card`, `popover`, or similar), ask the user to install the required shadcn component first instead of creating or installing it yourself.
 - Use relevant skills when writing or updating code.
 
 ## Workflow Rules

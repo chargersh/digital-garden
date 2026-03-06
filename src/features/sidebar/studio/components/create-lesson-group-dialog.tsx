@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
+import { MAX_CREATION_TITLE_LENGTH } from "./title-length";
 
 interface CreateLessonGroupDialogProps {
   subjectId: Id<"subjects">;
@@ -32,7 +33,8 @@ export function CreateLessonGroupDialog({
   const [groupName, setGroupName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const trimmedName = groupName.trim();
-  const isNameValid = trimmedName.length >= 5;
+  const isNameValid =
+    trimmedName.length >= 5 && trimmedName.length <= MAX_CREATION_TITLE_LENGTH;
 
   const handleOpenChange = (nextOpen: boolean) => {
     setOpen(nextOpen);
@@ -94,6 +96,7 @@ export function CreateLessonGroupDialog({
           <Input
             aria-label="Lesson group name"
             autoFocus
+            maxLength={MAX_CREATION_TITLE_LENGTH}
             onChange={(event) => setGroupName(event.target.value)}
             onKeyDown={(event) => {
               if (event.key === "Enter") {
@@ -104,6 +107,9 @@ export function CreateLessonGroupDialog({
             placeholder="Group name"
             value={groupName}
           />
+          <p className="text-muted-foreground text-xs">
+            {`${groupName.length}/${MAX_CREATION_TITLE_LENGTH} characters`}
+          </p>
         </DialogPanel>
 
         <DialogFooter className="pt-0 sm:justify-between" variant="bare">

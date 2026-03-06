@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
+import { MAX_CREATION_TITLE_LENGTH } from "./title-length";
 
 interface CreateLessonNodeDialogProps {
   ariaLabel: string;
@@ -52,7 +53,8 @@ export function CreateLessonNodeDialog({
   const [nodeName, setNodeName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const trimmedName = nodeName.trim();
-  const isNameValid = trimmedName.length > 0;
+  const isNameValid =
+    trimmedName.length > 0 && trimmedName.length <= MAX_CREATION_TITLE_LENGTH;
 
   const handleOpenChange = (nextOpen: boolean) => {
     setOpen(nextOpen);
@@ -107,6 +109,7 @@ export function CreateLessonNodeDialog({
           <Input
             aria-label={placeholder}
             autoFocus
+            maxLength={MAX_CREATION_TITLE_LENGTH}
             onChange={(event) => setNodeName(event.target.value)}
             onKeyDown={(event) => {
               if (event.key === "Enter") {
@@ -117,6 +120,9 @@ export function CreateLessonNodeDialog({
             placeholder={placeholder}
             value={nodeName}
           />
+          <p className="text-muted-foreground text-xs">
+            {`${nodeName.length}/${MAX_CREATION_TITLE_LENGTH} characters`}
+          </p>
         </DialogPanel>
 
         <DialogFooter className="pt-0 sm:justify-between" variant="bare">

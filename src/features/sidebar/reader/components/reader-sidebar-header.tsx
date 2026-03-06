@@ -17,7 +17,7 @@ export function ReaderSidebarHeader({
   return (
     <div className="flex flex-col gap-3">
       <SubjectSelector subjectName={subjectName} subjectSlug={subjectSlug} />
-      <Button asChild>
+      <Button asChild variant="outline">
         <Link href={`/studio/${subjectSlug}`}>
           <ArrowRightIcon aria-hidden="true" />
           Go to Studio

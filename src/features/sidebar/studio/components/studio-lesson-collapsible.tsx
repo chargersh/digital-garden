@@ -15,7 +15,6 @@ import type { LessonNode } from "@/features/sidebar/shared/types";
 import { cn } from "@/lib/utils";
 import { CreateCollapsibleButton } from "./create-collapsible-button";
 import { CreateLessonButton } from "./create-lesson-button";
-import { DeleteLessonNodeDialog } from "./delete-lesson-node-dialog";
 import { NodeContextMenu } from "./node-context-menu";
 import { StudioSlideActionsRail } from "./studio-slide-actions-rail";
 import { StudioSortableHandleButton } from "./studio-sortable-handle-button";
@@ -53,6 +52,7 @@ export function StudioLessonCollapsible({
 
   return (
     <NodeContextMenu
+      childItems={childItems}
       groupId={groupId}
       nodeId={nodeId}
       nodeKind="collapsible"
@@ -108,17 +108,11 @@ export function StudioLessonCollapsible({
                 subjectId={subjectId}
               />
               <CreateCollapsibleButton
-                ariaLabel={`Create collapsible in ${title}`}
+                ariaLabel={`Create section in ${title}`}
                 groupId={groupId}
                 parentNodeId={nodeId}
                 parentTitle={title}
                 subjectId={subjectId}
-              />
-              <DeleteLessonNodeDialog
-                childItems={childItems}
-                nodeId={nodeId}
-                nodeKind="collapsible"
-                title={title}
               />
               <StudioSortableHandleButton ariaLabel={`Reorder ${title}`} />
             </StudioSlideActionsRail>
